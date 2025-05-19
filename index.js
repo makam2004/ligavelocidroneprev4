@@ -81,6 +81,14 @@ app.use(adminRoutes);
 app.use(rankingRoutes);
 app.use(commitRankingRoutes);
 
+// ✅ Endpoint para exponer credenciales Supabase al frontend (anon)
+app.get("/api/supabase-credentials", (req, res) => {
+  res.json({
+    url: process.env.SUPABASE_URL,
+    key: process.env.SUPABASE_KEY
+  });
+});
+
 // ✅ Iniciar servidor
 app.listen(PORT, () => {
   console.log(`Servidor iniciado en http://localhost:${PORT}`);
