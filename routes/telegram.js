@@ -19,14 +19,12 @@ router.get('/api/enviar-ranking-telegram', async (req, res) => {
 
     if (errTracks || errRanking) throw errTracks || errRanking;
 
-    let mensaje = '🏁 *Tracks actuales:*
-';
-    mensaje += tracks.map(t => `- ${t.nombre}`).join('\n');
-    mensaje += '\n\n📊 *Ranking Semanal:*
-';
-    ranking.forEach((j, i) => {
-      mensaje += `${i + 1}. ${j.nombre} - ${j.puntos_semanales} pts\n`;
-    });
+    const mensaje = `🏁 *Tracks actuales:*
+${tracks.map(t => `- ${t.nombre}`).join('\n')}
+
+📊 *Ranking Semanal:*
+${ranking.map((j, i) => `${i + 1}. *${j.nombre}* — \`${j.puntos_semanales}\` pts`).join('\n')}
+`;
 
     const telegramURL = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`;
 
