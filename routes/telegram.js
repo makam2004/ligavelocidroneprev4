@@ -87,7 +87,11 @@ router.get('/api/enviar-ranking-telegram', async (req, res) => {
     for (const { url, pestaña } of urls) {
       const { pista, escenario, resultados } = await obtenerResultados(url, nombresJugadores, pestaña);
 
-      mensaje += `\n📍 *${escenario} - ${pista}*\n`;
+      const tipo = pestaña.includes('3 Lap')
+        ? 'Single Class - Three Lap Race'
+        : 'Single Class - Laps';
+
+      mensaje += `\n📍 *${tipo} - ${escenario} - ${pista}*\n`;
       resultados
         .sort((a, b) => a.tiempo - b.tiempo)
         .slice(0, 10)
