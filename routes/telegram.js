@@ -92,12 +92,12 @@ router.get('/api/enviar-ranking-telegram', async (req, res) => {
         : 'Single Class - Laps';
 
       mensaje += `\n📍 *${tipo} - ${escenario} - ${pista}*\n`;
-      resultados
-        .sort((a, b) => a.tiempo - b.tiempo)
-        .slice(0, 10)
-        .forEach((r, i) => {
-          mensaje += `${i + 1}. ${r.jugador} — \`${r.tiempo.toFixed(2)}s\`\n`;
-        });
+
+      const ordenados = resultados.sort((a, b) => a.tiempo - b.tiempo);
+      ordenados.forEach((r, i) => {
+        const medalla = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '🍬';
+        mensaje += `${medalla} **${r.jugador}** — \`${r.tiempo.toFixed(2)}s\`\n`;
+      });
     }
 
     const telegramURL = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`;
