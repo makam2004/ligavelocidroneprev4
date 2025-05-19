@@ -6,6 +6,7 @@ import supabase from './supabaseClient.js';
 import tiemposMejorados from './routes/tiemposMejorados.js';
 import adminRoutes from './routes/admin.js'
 import rankingRoutes from './routes/ranking.js';
+import commitRankingRoutes from './routes/commit_ranking.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -78,6 +79,7 @@ app.post('/api/alta-jugador', async (req, res) => {
 app.use(tiemposMejorados);
 app.use(adminRoutes); 
 app.use(rankingRoutes);
+app.use(commitRankingRoutes);
 
 // ✅ Iniciar servidor
 app.listen(PORT, () => {

@@ -85,5 +85,43 @@ document.getElementById("mensaje").textContent = json.mensaje || "✅ Actualizac
     };
   </script>
 
+
+<hr>
+<h3>Ranking</h3>
+<button onclick="commitRanking()">Hacer Commit al Ranking Anual</button>
+
+<script>
+const ADMIN_USER = "admin";
+const ADMIN_PASS = "1234";
+
+let autenticado = false;
+
+function solicitarCredenciales() {
+    const user = prompt("Usuario:");
+    const pass = prompt("Contraseña:");
+    if (user === ADMIN_USER && pass === ADMIN_PASS) {
+        autenticado = true;
+        alert("Autenticación correcta.");
+    } else {
+        alert("Credenciales incorrectas.");
+        location.href = "https://google.com";
+    }
+}
+
+window.onload = solicitarCredenciales;
+
+async function commitRanking() {
+    if (!autenticado) {
+        alert("No autenticado.");
+        return;
+    }
+    if (confirm("¿Estás seguro de que quieres hacer commit del ranking semanal al anual?")) {
+        const response = await fetch("/api/commit-ranking", { method: "POST" });
+        const result = await response.json();
+        alert(result.message);
+    }
+}
+</script>
+
 </body>
 </html>
