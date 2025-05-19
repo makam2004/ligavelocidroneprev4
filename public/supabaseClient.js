@@ -1,8 +1,13 @@
-import { createClient } from '@supabase/supabase-js';
+let supabase;
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
-);
+async function initSupabase() {
+  if (supabase) return supabase;
 
-export default supabase;
+  const res = await fetch("/api/supabase-credentials");
+  const creds = await res.json();
+
+  supabase = window.supabase.createClient(creds.url, creds.key);
+  return supabase;
+}
+
+window.initSupabase = initSupabase;

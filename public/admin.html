@@ -1,127 +1,24 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Panel de Administración - Liga Velocidrone</title>
-  <style>
-    body {
-      background-color: black;
-      color: white;
-      font-family: Arial, sans-serif;
-      padding: 30px;
-    }
-    h1 {
-      font-size: 26px;
-      margin-bottom: 20px;
-    }
-    form {
-      max-width: 500px;
-    }
-    label {
-      display: block;
-      margin-top: 15px;
-    }
-    input {
-      width: 100%;
-      padding: 8px;
-      margin-top: 4px;
-      border: none;
-      border-radius: 4px;
-    }
-    button {
-      margin-top: 20px;
-      padding: 10px 15px;
-      font-size: 16px;
-      background-color: #007bff;
-      border: none;
-      border-radius: 5px;
-      color: white;
-      cursor: pointer;
-    }
-    #mensaje {
-      margin-top: 20px;
-      font-size: 16px;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>Panel de Administración</title>
 </head>
 <body>
+  <h1>Panel Admin</h1>
 
-  <h1>⚙️ Administración de Tracks</h1>
-
-  <form id="formTracks">
-    <label>Track 1 - Escenario ID:
-      <input name="track1_escena" type="number" required />
-    </label>
-    <label>Track 1 - Pista ID:
-      <input name="track1_pista" type="number" required />
-    </label>
-    <label>Track 2 - Escenario ID:
-      <input name="track2_escena" type="number" required />
-    </label>
-    <label>Track 2 - Pista ID:
-      <input name="track2_pista" type="number" required />
-    </label>
-    <button type="submit">Actualizar Tracks</button>
-  </form>
-
-  <div id="mensaje"></div>
+  <hr>
+  <h3>Ranking</h3>
+  <button onclick="commitRanking()">Hacer Commit al Ranking Anual</button>
 
   <script>
-    document.getElementById("formTracks").onsubmit = async (e) => {
-      e.preventDefault();
-      const formData = Object.fromEntries(new FormData(e.target));
-
-      try {
-const res = await fetch('/admin/update-tracks', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(formData)
-});
-const json = await res.json();
-document.getElementById("mensaje").textContent = json.mensaje || "✅ Actualización completada.";
-      } catch (err) {
-        document.getElementById("mensaje").textContent = "❌ Error al actualizar tracks.";
-      }
-    };
-  </script>
-
-
-<hr>
-<h3>Ranking</h3>
-<button onclick="commitRanking()">Hacer Commit al Ranking Anual</button>
-
-<script>
-const ADMIN_USER = "admin";
-const ADMIN_PASS = "1234";
-
-let autenticado = false;
-
-function solicitarCredenciales() {
-    const user = prompt("Usuario:");
-    const pass = prompt("Contraseña:");
-    if (user === ADMIN_USER && pass === ADMIN_PASS) {
-        autenticado = true;
-        alert("Autenticación correcta.");
-    } else {
-        alert("Credenciales incorrectas.");
-        location.href = "https://google.com";
-    }
-}
-
-window.onload = solicitarCredenciales;
-
-async function commitRanking() {
-    if (!autenticado) {
-        alert("No autenticado.");
-        return;
-    }
-    if (confirm("¿Estás seguro de que quieres hacer commit del ranking semanal al anual?")) {
+    async function commitRanking() {
+      if (confirm("¿Estás seguro de que quieres hacer commit del ranking semanal al anual?")) {
         const response = await fetch("/api/commit-ranking", { method: "POST" });
         const result = await response.json();
         alert(result.message);
+      }
     }
-}
-</script>
-
+  </script>
 </body>
 </html>
