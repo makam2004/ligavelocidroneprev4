@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Panel de Administración - Liga Velocidrone</title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      font-family: Arial, sans-serif;
+      padding: 30px;
+    }
+    h1 {
+      font-size: 26px;
+      margin-bottom: 20px;
+    }
+    form {
+      max-width: 500px;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      border: none;
+      border-radius: 4px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 15px;
+      font-size: 16px;
+      background-color: #007bff;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+    }
+    #mensaje {
+      margin-top: 20px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>⚙️ Administración de Tracks</h1>
+
+  <form id="formTracks">
+    <label>Track 1 - Escenario ID:
+      <input name="track1_escena" type="number" required />
+    </label>
+    <label>Track 1 - Pista ID:
+      <input name="track1_pista" type="number" required />
+    </label>
+    <label>Track 2 - Escenario ID:
+      <input name="track2_escena" type="number" required />
+    </label>
+    <label>Track 2 - Pista ID:
+      <input name="track2_pista" type="number" required />
+    </label>
+    <button type="submit">Actualizar Tracks</button>
+  </form>
+
+  <div id="mensaje"></div>
+
+  <script>
+    document.getElementById("formTracks").onsubmit = async (e) => {
+      e.preventDefault();
+      const formData = Object.fromEntries(new FormData(e.target));
+
+      try {
+const res = await fetch('/admin/update-tracks', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(formData)
+});
+const json = await res.json();
+document.getElementById("mensaje").textContent = json.mensaje || "✅ Actualización completada.";
+      } catch (err) {
+        document.getElementById("mensaje").textContent = "❌ Error al actualizar tracks.";
+      }
+    };
+  </script>
+
+</body>
+</html>

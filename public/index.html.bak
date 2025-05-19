@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>LIGA VELOCIDRONE</title>
+  <link rel="stylesheet" href="main.css" />
+</head>
+<body>
+  <div class="top-bar">
+    <div class="top-left">
+      <button id="btnReglamento">📘 Reglamento</button>
+    </div>
+    <div class="top-center">
+      <h1 id="tituloSemana">LIGA VELOCIDRONE</h1>
+    </div>
+    <div class="top-right">
+      <button id="btnAlta">➕ Alta de Piloto</button>
+      <a href="https://t.me/ligasemanalvelocidron" target="_blank" id="telegramIcon">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram">
+      </a>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay"></div>
+
+  <div class="container">
+    <div class="track-row">
+      <div id="track1" class="card">⏳ Leyendo resultados...</div>
+      <div id="track2" class="card">⏳ Leyendo resultados...</div>
+    </div>
+    <div class="ranking-row">
+      <div id="rankingSemanal" class="card">
+        <h3>Ranking Semanal</h3>
+        <div class="resultado"></div>
+      </div>
+      <div id="rankingAnual" class="card">
+        <h3>Ranking Anual</h3>
+        <div class="resultado"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup Reglamento -->
+  <div id="popup" class="popup" style="display:none;">
+    <h3>Reglamento</h3>
+    <button onclick="cerrarPopups()" style="float:right;background:#ff4444;">✖</button>
+    <div id="popupTexto"></div>
+  </div>
+
+  <!-- Popup Alta Piloto -->
+  <div id="popupAlta" class="popup" style="display:none;">
+    <h3>Alta de piloto</h3>
+    <button onclick="cerrarPopups()" style="float:right;background:#ff4444;">✖</button>
+    <form onsubmit="registrarJugador(event)">
+      <input id="nombreJugador" type="text" placeholder="Nombre del Piloto en Velocidrone" required style="width:100%;padding:10px;margin-top:10px;" />
+      <div class="h-captcha" data-sitekey="8ac62e84-891a-4d2e-b8a0-e39aabb4b246"></div>
+      <button type="submit" style="margin-top:10px;">Registrar</button>
+    </form>
+    <div id="mensajeAlta" style="margin-top:10px;color:lightgreen;"></div>
+  </div>
+
+  <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+  <script src="main.js" defer></script>
+</body>
+</html>

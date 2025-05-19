@@ -1,0 +1,54 @@
+import express from 'express';
+import basicAuth from 'express-basic-auth';
+import supabase from '../supabaseClient.js';
+
+
+const router = express.Router();
+
+// Supabase client
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+
+// Middleware de autenticación solo para rutas /admin y /admin/update-tracks
+const auth = basicAuth({
+  users: { [process.env.ADMIN_USER]: process.env.ADMIN_PASS },
+  challenge: true
+});
+
+router.use('/admin', auth);
+router.use('/admin/update-tracks', auth);
+
+// Servir la página admin.html protegida
+router.get('/admin', (_req, res) => {
+  res.sendFile('admin.html', { root: './public' });
+});
+
+// Ruta POST para actualizar tracks y ejecutar función de consolidación de puntos
+router.post('/admin/update-tracks', async (req, res) => {
+  try {
+    const { track1_escena, track1_pista, track2_escena, track2_pista } = req.body;
+
+    const { error } = await supabase
+      .from('configuracion')
+      .upsert([{
+        id: 1,
+        track1_escena,
+        track1_pista,
+        track2_escena,
+        track2_pista,
+        fecha_actualizacion: new Date().toISOString()
+      }], { onConflict: ['id'] });
+
+    if (error) throw error;
+
+    // Llamada a la función de Supabase que suma los puntos del ranking semanal al anual
+    const { error: rpcError } = await supabase.rpc('incrementar_ranking_anual');
+    if (rpcError) throw rpcError;
+
+    res.status(200).json({ mensaje: '✅ Tracks actualizados y puntos añadidos al ranking anual' });
+  } catch (err) {
+    console.error('❌ Error en update-tracks:', err.message);
+    res.status(500).json({ error: 'Error al actualizar tracks o ranking anual' });
+  }
+});
+
+export default router;

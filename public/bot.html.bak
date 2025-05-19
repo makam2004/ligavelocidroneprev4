@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Enviar mensaje a Telegram</title>
+</head>
+<body>
+  <h2>Enviar mensaje a Telegram</h2>
+  <input type="text" id="mensaje" placeholder="Escribe tu mensaje" />
+  <button onclick="enviarMensaje()">Enviar</button>
+
+  <script>
+    async function enviarMensaje() {
+      const mensaje = document.getElementById("mensaje").value;
+      const token = '6670178505:AAHQquedR_BdjLej1Ws9C5XsNlOWcW0SYjs';
+      const chat_id = '-1002099781694'; // tu ID de grupo
+
+      const url = `https://api.telegram.org/bot${token}/sendMessage`;
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chat_id, text: mensaje })
+      });
+
+      const data = await response.json();
+      if (data.ok) {
+        alert("Mensaje enviado correctamente");
+      } else {
+        alert("Error al enviar mensaje");
+        console.error(data);
+      }
+    }
+  </script>
+</body>
+</html>
