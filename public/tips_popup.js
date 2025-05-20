@@ -8,19 +8,25 @@ async function cargarTipsPopup() {
       supabaseClient = window.supabase.createClient(creds.url, creds.key);
     }
 
+    const contenedor = document.querySelector("#popupTipsContenido");
+    if (!contenedor) {
+      console.error("❌ No se encontró el contenedor #popupTipsContenido");
+      return;
+    }
+
+    contenedor.innerHTML = ""; // limpia contenido anterior
+    console.log("✅ Contenedor encontrado, limpiado y listo para mostrar tips");
+
     const { data, error } = await supabaseClient
       .from("tips")
       .select("*")
       .order("fecha", { ascending: false });
 
-    const contenedor = document.getElementById("popupTipsContenido");
-    contenedor.innerHTML = ""; // 🧹 limpia antes de renderizar
-
     if (error || !data) {
       contenedor.innerHTML = "<p>Error al cargar los tips.</p>";
-      console.error("Error cargando tips:", error);
+      console.error("❌ Error al cargar datos de Supabase:", error);
     } else {
-      contenedor.innerHTML = data.map(tip => {
+      const bloquesHTML = data.map(tip => {
         const fecha = new Date(tip.fecha).toLocaleDateString("es-ES");
         let preview = "";
         if (tip.tipo === "youtube") {
@@ -41,18 +47,26 @@ async function cargarTipsPopup() {
             </div>
           </div>
         `;
-      }).join("");
+      });
+
+      contenedor.innerHTML = bloquesHTML.join("");
+      console.log(`✅ Se insertaron ${data.length} tips en #popupTipsContenido`);
     }
 
     // Mostrar popup y fondo
-    document.getElementById("popupTips").style.display = "block";
-    document.getElementById("overlay").style.display = "block";
+    const popup = document.querySelector("#popupTips");
+    const overlay = document.getElementById("overlay");
+    if (popup && overlay) {
+      popup.style.display = "block";
+      overlay.style.display = "block";
+      console.log("✅ popupTips y overlay visibles");
+    } else {
+      console.error("❌ popupTips o overlay no encontrados");
+    }
 
   } catch (err) {
-    console.error("Error general al cargar Tips:", err);
-    const contenedor = document.getElementById("popupTipsContenido");
-    contenedor.innerHTML = "<p>Error inesperado al cargar los tips.</p>";
-    document.getElementById("popupTips").style.display = "block";
-    document.getElementById("overlay").style.display = "block";
+    console.error("❌ Error general:", err);
+    const contenedor = document.querySelector("#popupTipsContenido");
+    if (contenedor) contenedor.innerHTML = "<p>Error inesperado al cargar los tips.</p>";
   }
 }
