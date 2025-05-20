@@ -9,7 +9,7 @@
   <div class="top-bar">
     <div class="top-left">
       <button id="btnReglamento">📘 Reglamento</button>
-      <a href="tips.html"><button id="btnTips">💡 Tips y Trucos</button></a>
+      <button id="btnTips" onclick="cargarTipsPopup()">💡 Tips y Trucos</button>
     </div>
     <div class="top-center">
       <h1 id="tituloSemana">LIGA VELOCIDRONE</h1>
@@ -65,10 +65,18 @@
     <div id="mensajeAlta" style="margin-top:10px;color:lightgreen;"></div>
   </div>
 
+  <!-- Popup Tips -->
+  <div id="popupTips" class="popup" style="display:none; max-height:80vh; overflow-y:auto; background:#111; padding:20px; border-radius:8px;">
+    <h3>💡 Tips y Trucos</h3>
+    <button onclick="cerrarPopups()" style="float:right;background:#ff4444;">✖</button>
+    <div id="popupTipsContenido" style="margin-top: 20px;"></div>
+  </div>
+
   <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="supabaseClient.js"></script>
   <script src="Ranking.js"></script>
+  <script src="tips_popup.js"></script>
   <script src="main.js" defer></script>
 </body>
 </html>
