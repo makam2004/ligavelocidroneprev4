@@ -34,7 +34,7 @@
       border-radius: 4px;
       cursor: pointer;
     }
-    #cerrarTips {
+    #popupTips button {
       position: absolute;
       top: 10px;
       right: 10px;
@@ -103,7 +103,7 @@
 
   <div id="popupTips" class="popup" style="width: 80%; max-width: 1000px; max-height: 80vh; overflow-y: auto;">
     <h3>💡 Tips y Trucos</h3>
-    <button id="cerrarTips">✖</button>
+    <button onclick="cerrarPopups()">✖</button>
     <div id="popupTipsContenido" style="margin-top: 40px;"></div>
   </div>
 
@@ -114,13 +114,6 @@
         if (el) el.style.display = "none";
       });
     }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      const cerrarBoton = document.getElementById("cerrarTips");
-      if (cerrarBoton) {
-        cerrarBoton.addEventListener("click", cerrarPopups);
-      }
-    });
   </script>
 
   <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
