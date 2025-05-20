@@ -33,12 +33,12 @@
       padding: 6px 10px;
       border-radius: 4px;
       cursor: pointer;
-      z-index: 1002;
-      position: absolute;
     }
-    #popupTips button {
+    #cerrarTips {
+      position: absolute;
       top: 10px;
       right: 10px;
+      z-index: 1002;
     }
   </style>
 </head>
@@ -59,7 +59,7 @@
     </div>
   </div>
 
-  <div class="overlay" id="overlay"></div>
+  <div class="overlay" id="overlay" onclick="cerrarPopups()"></div>
 
   <div class="container">
     <div id="mejoras" class="track-row">⏳ Leyendo resultados...</div>
@@ -86,13 +86,13 @@
   <!-- Popups -->
   <div id="popup" class="popup">
     <h3>📘 Reglamento</h3>
-    <button onclick="cerrarPopups()">✖</button>
+    <button onclick="cerrarPopups()" style="float:right;">✖</button>
     <div id="popupTexto"></div>
   </div>
 
   <div id="popupAlta" class="popup">
     <h3>Alta de piloto</h3>
-    <button onclick="cerrarPopups()">✖</button>
+    <button onclick="cerrarPopups()" style="float:right;">✖</button>
     <form onsubmit="registrarJugador(event)">
       <input id="nombreJugador" type="text" placeholder="Nombre del Piloto en Velocidrone" required style="width:100%;padding:10px;margin-top:10px;" />
       <div class="h-captcha" data-sitekey="8ac62e84-891a-4d2e-b8a0-e39aabb4b246"></div>
@@ -119,10 +119,6 @@
       const cerrarBoton = document.getElementById("cerrarTips");
       if (cerrarBoton) {
         cerrarBoton.addEventListener("click", cerrarPopups);
-      }
-      const overlay = document.getElementById("overlay");
-      if (overlay) {
-        overlay.addEventListener("click", cerrarPopups);
       }
     });
   </script>
