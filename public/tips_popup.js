@@ -14,6 +14,8 @@ async function cargarTipsPopup() {
       .order("fecha", { ascending: false });
 
     const contenedor = document.getElementById("popupTipsContenido");
+    contenedor.innerHTML = ""; // 🧹 limpia antes de renderizar
+
     if (error || !data) {
       contenedor.innerHTML = "<p>Error al cargar los tips.</p>";
       console.error("Error cargando tips:", error);
