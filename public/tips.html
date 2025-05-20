@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tips y Trucos</title>
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    .tips-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    .tip-card {
+      background: #111;
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+    }
+    .tip-card img {
+      width: 100%;
+      border-radius: 8px;
+    }
+    .tip-title {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    a {
+      color: #0bf;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <h2>💡 Tips y Trucos</h2>
+  <div class="tips-grid" id="tipsContainer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="tips.js"></script>
+</body>
+</html>

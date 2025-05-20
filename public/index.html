@@ -9,6 +9,7 @@
   <div class="top-bar">
     <div class="top-left">
       <button id="btnReglamento">📘 Reglamento</button>
+      <a href="tips.html"><button id="btnTips">💡 Tips y Trucos</button></a>
     </div>
     <div class="top-center">
       <h1 id="tituloSemana">LIGA VELOCIDRONE</h1>
@@ -21,53 +22,7 @@
     </div>
   </div>
 
-  <div class="overlay" id="overlay"></div>
+  <!-- ... resto de contenido de la página principal ... -->
 
-  <div class="container">
-    <div id="mejoras" class="track-row">⏳ Leyendo resultados...</div>
-    <div class="ranking-row">
-      <div id="rankingSemanal" class="card">
-        <h3>Ranking Semanal</h3>
-        <div class="resultado"></div>
-      </div>
-      <div id="rankingAnual" class="card">
-        <h3>Ranking Anual</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Piloto</th>
-              <th>Puntos</th>
-            </tr>
-          </thead>
-          <tbody id="ranking-anual-body"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- Popup Reglamento -->
-  <div id="popup" class="popup" style="display:none;">
-    <h3>Reglamento</h3>
-    <button onclick="cerrarPopups()" style="float:right;background:#ff4444;">✖</button>
-    <div id="popupTexto"></div>
-  </div>
-
-  <!-- Popup Alta Piloto -->
-  <div id="popupAlta" class="popup" style="display:none;">
-    <h3>Alta de piloto</h3>
-    <button onclick="cerrarPopups()" style="float:right;background:#ff4444;">✖</button>
-    <form onsubmit="registrarJugador(event)">
-      <input id="nombreJugador" type="text" placeholder="Nombre del Piloto en Velocidrone" required style="width:100%;padding:10px;margin-top:10px;" />
-      <div class="h-captcha" data-sitekey="8ac62e84-891a-4d2e-b8a0-e39aabb4b246"></div>
-      <button type="submit" style="margin-top:10px;">Registrar</button>
-    </form>
-    <div id="mensajeAlta" style="margin-top:10px;color:lightgreen;"></div>
-  </div>
-
-  <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script src="supabaseClient.js"></script>
-  <script src="Ranking.js"></script>
-  <script src="main.js" defer></script>
 </body>
 </html>
