@@ -46,14 +46,13 @@
     </div>
   </div>
 
-  <!-- Popup Reglamento -->
+  <!-- Popups -->
   <div id="popup" class="popup" style="display:none;">
     <h3>Reglamento</h3>
     <button onclick="cerrarPopups()" style="float:right;background:#ff4444;">✖</button>
     <div id="popupTexto"></div>
   </div>
 
-  <!-- Popup Alta Piloto -->
   <div id="popupAlta" class="popup" style="display:none;">
     <h3>Alta de piloto</h3>
     <button onclick="cerrarPopups()" style="float:right;background:#ff4444;">✖</button>
@@ -65,12 +64,20 @@
     <div id="mensajeAlta" style="margin-top:10px;color:lightgreen;"></div>
   </div>
 
-  <!-- Popup Tips -->
-  <div id="popupTips" class="popup" style="display:none; max-height:80vh; overflow-y:auto; background:#111; padding:20px; border-radius:8px;">
+  <div id="popupTips" class="popup" style="display:none; max-height:80vh; overflow-y:auto; background:#111; padding:20px; border-radius:8px; width:80%; max-width:1000px; margin:auto; position:relative;">
     <h3>💡 Tips y Trucos</h3>
-    <button onclick="cerrarPopups()" style="float:right;background:#ff4444;">✖</button>
-    <div id="popupTipsContenido" style="margin-top: 20px;"></div>
+    <button onclick="cerrarPopups()" style="position:absolute;top:10px;right:10px;background:#ff4444;">✖</button>
+    <div id="popupTipsContenido" style="margin-top: 40px;"></div>
   </div>
+
+  <script>
+    function cerrarPopups() {
+      document.getElementById("popup").style.display = "none";
+      document.getElementById("popupAlta").style.display = "none";
+      document.getElementById("popupTips").style.display = "none";
+      document.getElementById("overlay").style.display = "none";
+    }
+  </script>
 
   <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
