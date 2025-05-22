@@ -8,6 +8,7 @@ import adminRoutes from './routes/admin.js'
 import rankingRoutes from './routes/ranking.js';
 import commitRankingRoutes from './routes/commit_ranking.js';
 import telegramRoutes from './routes/telegram.js';
+import checkMejoras from "./routes/checkMejoras.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -82,6 +83,7 @@ app.use(adminRoutes);
 app.use(rankingRoutes);
 app.use(commitRankingRoutes);
 app.use(telegramRoutes);
+app.use(checkMejoras);
 
 // ✅ Endpoint para exponer credenciales Supabase al frontend (anon)
 app.get("/api/supabase-credentials", (req, res) => {

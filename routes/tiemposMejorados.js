@@ -137,3 +137,43 @@ router.get('/api/tiempos-mejorados', async (_req, res) => {
 });
 
 export default router;
+
+export async function tiemposMejorados() {
+  const semana = calcularSemanaActual();
+
+  const { data: jugadores, error: errorJugadores } = await supabase.from('jugadores').select('id, nombre');
+  if (errorJugadores) return [];
+
+  const nombreToId = Object.fromEntries(jugadores.map(j => [j.nombre, j.id]));
+
+  const { data: config, error: errorConfig } = await supabase.from('configuracion').select('*').eq('id', 1).maybeSingle();
+  if (errorConfig || !config) return [];
+
+  const urls = [
+    {
+      url: `https://www.velocidrone.com/leaderboard/${config.track1_escena}/${config.track1_pista}/All`,
+      pestaña: 'Race Mode: Single Class',
+      nombre: 'Track 1'
+    },
+    {
+      url: `https://www.velocidrone.com/leaderboard/${config.track2_escena}/${config.track2_pista}/All`,
+      pestaña: '3 Lap: Single Class',
+      nombre: 'Track 2'
+    }
+  ];
+
+  const todo = [];
+
+  for (const { url, pestaña, nombre } of urls) {
+    const { resultados } = await obtenerResultados(url, Object.keys(nombreToId), pestaña);
+    resultados.forEach(r => {
+      todo.push({
+        piloto: r.jugador,
+        track: nombre,
+        tiempo: r.tiempo
+      });
+    });
+  }
+
+  return todo;
+}
