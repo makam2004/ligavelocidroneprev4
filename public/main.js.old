@@ -42,24 +42,20 @@ function mostrarAlta() {
   if (window.hcaptcha) hcaptcha.reset();
 }
 
-
 function cerrarPopups() {
   const popup = document.getElementById('popup');
   const popupAlta = document.getElementById('popupAlta');
-  const popupTips = document.getElementById('popupTips');
   const overlay = document.getElementById('overlay');
   const mensajeAlta = document.getElementById('mensajeAlta');
   const nombreJugador = document.getElementById('nombreJugador');
 
-  if (popup)       popup.style.display = 'none';
-  if (popupAlta)   popupAlta.style.display = 'none';
-  if (popupTips)   popupTips.style.display = 'none';
-  if (overlay)     overlay.style.display = 'none';
+  if (popup) popup.style.display = 'none';
+  if (popupAlta) popupAlta.style.display = 'none';
+  if (overlay) overlay.style.display = 'none';
   if (mensajeAlta) mensajeAlta.textContent = '';
   if (nombreJugador) nombreJugador.value = '';
   if (window.hcaptcha) hcaptcha.reset();
 }
-
 
 async function registrarJugador(event) {
   event.preventDefault();
