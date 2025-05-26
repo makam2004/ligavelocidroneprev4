@@ -1,4 +1,3 @@
-
 import express from "express";
 import supabase from "../supabaseClient.js";
 import axios from "axios";
@@ -48,26 +47,22 @@ router.get("/api/check-mejoras", async (req, res) => {
 
     console.log("Mejoras detectadas:", mejorasDetectadas);
     for (const mejora of mejorasDetectadas) {
-      const mensaje = `⏱️ Nueva mejora de tiempo en el *${mejora.track}*
-` +
-                      `👤 *Piloto*: ${mejora.piloto}
-` +
-                      `🔻 *Tiempo anterior*: ${mejora.tiempoAnterior.toFixed(2)} s
-` +
-                      `✅ *Nuevo tiempo*: ${mejora.tiempoNuevo.toFixed(2)} s
-` +
+      const mensaje = `⏱️ Nueva mejora de tiempo en el *${mejora.track}*\n` +
+                      `👤 *Piloto*: ${mejora.piloto}\n` +
+                      `🔻 *Tiempo anterior*: ${mejora.tiempoAnterior.toFixed(2)} s\n` +
+                      `✅ *Nuevo tiempo*: ${mejora.tiempoNuevo.toFixed(2)} s\n` +
                       `📅 ${new Date().toLocaleString("es-ES")}`;
 
       try {
-        console.log("Enviando mensaje a Telegram:", mensaje);
-        await axios.post(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
-          chat_id: process.env.TELEGRAM_CHAT_ID,
-          text: mensaje,
-          parse_mode: "Markdown"
-        });
-      } catch (e) {
-        console.error("Error enviando mensaje a Telegram:", e.response?.data || e.message);
-      }
+      console.log("Enviando mensaje a Telegram:", mensaje);
+      await axios.post(`https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`, {
+        chat_id: process.env.TELEGRAM_CHAT_ID,
+        text: mensaje,
+        parse_mode: "Markdown"
+      });
+    } catch (e) {
+      console.error("Error enviando mensaje a Telegram:", e.response?.data || e.message);
+    }
     }
 
     res.json({
