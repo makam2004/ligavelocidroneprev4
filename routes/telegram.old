@@ -1,4 +1,3 @@
-
 import express from 'express';
 import fetch from 'node-fetch';
 import supabase from '../supabaseClient.js';
@@ -83,8 +82,7 @@ router.get('/api/enviar-ranking-telegram', async (req, res) => {
       }
     ];
 
-    let mensaje = `🏁 *Resultados Semanales - Semana ${semana}*
-`;
+    let mensaje = `🏁 *Resultados Semanales - Semana ${semana}*\n`;
 
     for (const { url, pestaña } of urls) {
       const { pista, escenario, resultados } = await obtenerResultados(url, nombresJugadores, pestaña);
@@ -93,21 +91,14 @@ router.get('/api/enviar-ranking-telegram', async (req, res) => {
         ? 'Single Class - Three Lap Race'
         : 'Single Class - Laps';
 
-      mensaje += `
-📍 *${tipo} - ${escenario} - ${pista}*
-`;
+      mensaje += `\n📍 *${tipo} - ${escenario} - ${pista}*\n`;
 
       const ordenados = resultados.sort((a, b) => a.tiempo - b.tiempo);
       ordenados.forEach((r, i) => {
         const medalla = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '🍬';
-        mensaje += `${medalla} **${r.jugador}** — \`${r.tiempo.toFixed(2)}s\`
-`;
+        mensaje += `${medalla} **${r.jugador}** — \`${r.tiempo.toFixed(2)}s\`\n`;
       });
     }
-
-    mensaje += `
-📊 *Consulta los rankings completos en:*
-➡️ https://ligavelocidrone.onrender.com/`;
 
     const telegramURL = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`;
 
