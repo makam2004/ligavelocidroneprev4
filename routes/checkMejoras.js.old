@@ -7,10 +7,8 @@ const router = express.Router();
 
 router.get("/api/check-mejoras", async (req, res) => {
   try {
-    const datos = await tiemposMejorados();
-    console.log("Datos recibidos de tiemposMejorados:", datos); // debe devolver [{ piloto, track, tiempo }]
+    const datos = await tiemposMejorados(); // debe devolver [{ piloto, track, tiempo }]
     const mejorasDetectadas = [];
-    console.log("Comprobando mejoras para:", datos);
 
     for (const registro of datos) {
       const { piloto, track, tiempo } = registro;
@@ -45,7 +43,6 @@ router.get("/api/check-mejoras", async (req, res) => {
       }
     }
 
-    console.log("Mejoras detectadas:", mejorasDetectadas);
     for (const mejora of mejorasDetectadas) {
       const mensaje = `⏱️ Nueva mejora de tiempo en el *${mejora.track}*\n` +
                       `👤 *Piloto*: ${mejora.piloto}\n` +
@@ -53,16 +50,11 @@ router.get("/api/check-mejoras", async (req, res) => {
                       `✅ *Nuevo tiempo*: ${mejora.tiempoNuevo.toFixed(2)} s\n` +
                       `📅 ${new Date().toLocaleString("es-ES")}`;
 
-      try {
-      console.log("Enviando mensaje a Telegram:", mensaje);
       await axios.post(`https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`, {
         chat_id: process.env.TELEGRAM_CHAT_ID,
         text: mensaje,
         parse_mode: "Markdown"
       });
-    } catch (e) {
-      console.error("Error enviando mensaje a Telegram:", e.response?.data || e.message);
-    }
     }
 
     res.json({
