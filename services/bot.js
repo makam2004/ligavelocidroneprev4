@@ -74,20 +74,23 @@ bot.onText(/\/tracks/, async (msg) => {
   const chatId = msg.chat.id;
   try {
     const res = await fetch('https://ligavelocidroneprev2-1.onrender.com/api/configuracion');
-    const json = await res.json();
+    const text = await res.text();
 
-    console.log('/tracks respuesta:', json);
+    try {
+      const json = JSON.parse(text);
 
-    if (!json || !json.track1_escena || !json.track1_pista || !json.track2_escena || !json.track2_pista) {
-      await bot.sendMessage(chatId, '⚠️ Configuración de tracks no encontrada o incompleta.');
-      return;
+      if (!json || !json.track1_escena || !json.track1_pista || !json.track2_escena || !json.track2_pista) {
+        await bot.sendMessage(chatId, '⚠️ Configuración de tracks no encontrada o incompleta.');
+        return;
+      }
+
+      const texto = `🏁 <b>Track 1:</b> Race Mode: Single Class - ${json.track1_escena} - ${json.track1_pista}\n` +
+                    `⏱️ <b>Track 2:</b> 3 Lap: Single Class - ${json.track2_escena} - ${json.track2_pista}`;
+
+      await bot.sendMessage(chatId, texto, { parse_mode: 'HTML' });
+    } catch {
+      await bot.sendMessage(chatId, `⚠️ Respuesta no JSON:\n${text.substring(0, 1000)}`);
     }
-
-    const texto = `🏁 <b>Track 1:</b> Race Mode: Single Class - ${json.track1_escena} - ${json.track1_pista}\n` +
-                  `⏱️ <b>Track 2:</b> 3 Lap: Single Class - ${json.track2_escena} - ${json.track2_pista}`;
-
-    await bot.sendMessage(chatId, texto, { parse_mode: 'HTML' });
-
   } catch (error) {
     console.error('Error en /tracks:', error);
     await bot.sendMessage(chatId, '❌ Error al solicitar los tracks semanales.');
