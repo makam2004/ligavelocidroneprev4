@@ -1,11 +1,6 @@
 import TelegramBot from 'node-telegram-bot-api';
 import fetch from 'node-fetch';
 
-if (process.env.RUN_BOT !== 'true') {
-  console.log('Bot deshabilitado en esta instancia');
-  process.exit(0);
-}
-
 const token = process.env.TELEGRAM_BOT_TOKEN;
 
 if (!token) {
@@ -14,6 +9,15 @@ if (!token) {
 }
 
 const bot = new TelegramBot(token, { polling: true });
+
+bot.on('polling_error', (error) => {
+  if (error.code === 'ETELEGRAM' && error.message.includes('409')) {
+    console.error('Conflicto 409 detectado. Cerrando bot para evitar múltiples instancias.');
+    process.exit(1);
+  } else {
+    console.error('Error de polling:', error);
+  }
+});
 
 bot.onText(/\/top/, async (msg) => {
   const chatId = msg.chat.id;
