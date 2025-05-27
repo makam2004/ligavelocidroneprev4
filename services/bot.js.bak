@@ -42,8 +42,6 @@ bot.onText(/\/supertop/, async (msg) => {
     const res = await fetch('https://ligavelocidroneprev2-1.onrender.com/api/enviar-ranking-anual');
     const json = await res.json();
 
-    console.log('Respuesta /supertop:', json);
-
     let dataArray = null;
 
     if (json && json.ok && Array.isArray(json.data)) {
@@ -65,7 +63,6 @@ bot.onText(/\/supertop/, async (msg) => {
     await bot.sendMessage(chatId, `<b>🏆 Clasificación Anual 🏆</b>\n\n${texto}`, { parse_mode: 'HTML' });
 
   } catch (error) {
-    console.error('Error al obtener ranking anual:', error);
     await bot.sendMessage(chatId, '❌ Error al solicitar la clasificación anual.');
   }
 });
@@ -74,25 +71,19 @@ bot.onText(/\/tracks/, async (msg) => {
   const chatId = msg.chat.id;
   try {
     const res = await fetch('https://ligavelocidroneprev2-1.onrender.com/api/configuracion');
-    const text = await res.text();
+    const json = await res.json();
 
-    try {
-      const json = JSON.parse(text);
-
-      if (!json || !json.track1_escena || !json.track1_pista || !json.track2_escena || !json.track2_pista) {
-        await bot.sendMessage(chatId, '⚠️ Configuración de tracks no encontrada o incompleta.');
-        return;
-      }
-
-      const texto = `🏁 <b>Track 1:</b> Race Mode: Single Class - ${json.track1_escena} - ${json.track1_pista}\n` +
-                    `⏱️ <b>Track 2:</b> 3 Lap: Single Class - ${json.track2_escena} - ${json.track2_pista}`;
-
-      await bot.sendMessage(chatId, texto, { parse_mode: 'HTML' });
-    } catch {
-      await bot.sendMessage(chatId, `⚠️ Respuesta no JSON:\n${text.substring(0, 1000)}`);
+    if (!json || !json.track1_nombreEscenario || !json.track1_nombrePista ||
+        !json.track2_nombreEscenario || !json.track2_nombrePista) {
+      await bot.sendMessage(chatId, '⚠️ Configuración de tracks no encontrada o incompleta.');
+      return;
     }
+
+    const texto = `🏁 <b>Track 1:</b> Race Mode: Single Class - ${json.track1_nombreEscenario} - ${json.track1_nombrePista}\n` +
+                  `⏱️ <b>Track 2:</b> 3 Lap: Single Class - ${json.track2_nombreEscenario} - ${json.track2_nombrePista}`;
+
+    await bot.sendMessage(chatId, texto, { parse_mode: 'HTML' });
   } catch (error) {
-    console.error('Error en /tracks:', error);
     await bot.sendMessage(chatId, '❌ Error al solicitar los tracks semanales.');
   }
 });
