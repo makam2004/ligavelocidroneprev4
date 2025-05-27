@@ -79,13 +79,30 @@ bot.onText(/\/tracks/, async (msg) => {
       return;
     }
 
-    const texto = `🏁 <b>Track 1:</b> Race Mode: Single Class - ${json.track1_nombreEscenario} - ${json.track1_nombrePista}\n` +
-                  `⏱️ <b>Track 2:</b> 3 Lap: Single Class - ${json.track2_nombreEscenario} - ${json.track2_nombrePista}`;
+    const texto = 
+      `🏁 <b>Track 1:</b> Race Mode: Single Class - ${json.track1_nombreEscenario}\n` +
+      `<i>${json.track1_nombrePista}</i>\n\n` +
+      `⏱️ <b>Track 2:</b> 3 Lap: Single Class - ${json.track2_nombreEscenario}\n` +
+      `<i>${json.track2_nombrePista}</i>`;
 
     await bot.sendMessage(chatId, texto, { parse_mode: 'HTML' });
+
   } catch (error) {
     await bot.sendMessage(chatId, '❌ Error al solicitar los tracks semanales.');
   }
 });
 
-console.log('🤖 Bot activo, escuchando comandos /top, /supertop y /tracks');
+bot.onText(/\/help/, async (msg) => {
+  const chatId = msg.chat.id;
+  const texto =
+    `<b>🤖 Comandos disponibles:</b>\n\n` +
+    `<b>/top</b> - Envía el ranking semanal al grupo.\n` +
+    `<b>/supertop</b> - Muestra la clasificación anual actual.\n` +
+    `<b>/tracks</b> - Muestra los escenarios y nombres de pista semanales.\n` +
+    `<b>/help</b> - Muestra esta ayuda.\n\n` +
+    `Usa los comandos escribiéndolos en el chat, por ejemplo: <code>/top</code>`;
+
+  await bot.sendMessage(chatId, texto, { parse_mode: 'HTML' });
+});
+
+console.log('🤖 Bot activo, escuchando comandos /top, /supertop, /tracks y /help');
