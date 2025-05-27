@@ -1,11 +1,6 @@
 import TelegramBot from 'node-telegram-bot-api';
 import fetch from 'node-fetch';
 
-if (process.env.RUN_BOT !== 'true') {
-  console.log('Bot deshabilitado en esta instancia. Variable RUN_BOT no está activa.');
-  process.exit(0);
-}
-
 const token = process.env.TELEGRAM_BOT_TOKEN;
 
 if (!token) {
@@ -47,13 +42,29 @@ bot.onText(/\/supertop/, async (msg) => {
     const res = await fetch('http://ligavelocidrone.onrender.com/api/enviar-ranking-anual');
     const json = await res.json();
 
-    if (!json.ok) {
-      await bot.sendMessage(chatId, `Error al obtener la clasificación anual: ${json.error || json.message}`);
+    console.log('Respuesta /supertop:', json);
+
+    let dataArray = null;
+
+    if (json && json.ok && Array.isArray(json.data)) {
+      dataArray = json.data;
+    } else if (Array.isArray(json)) {
+      dataArray = json;
+    }
+
+    if (!dataArray) {
+      await bot.sendMessage(chatId, `Error: datos inválidos recibidos del servidor.`);
       return;
     }
 
-    await bot.sendMessage(chatId, '✅ Clasificación anual enviada al grupo!');
+    const texto = dataArray.map((jugador, i) =>
+      `${i + 1}º - ${jugador.nombre}: ${jugador.puntos_anuales} pts`
+    ).join('\n');
+
+    await bot.sendMessage(chatId, `<b>Clasificación Anual</b>:\n${texto}`, { parse_mode: 'HTML' });
+
   } catch (error) {
+    console.error('Error al obtener ranking anual:', error);
     await bot.sendMessage(chatId, '❌ Error al solicitar la clasificación anual.');
   }
 });

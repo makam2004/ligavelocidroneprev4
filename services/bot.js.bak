@@ -1,6 +1,11 @@
 import TelegramBot from 'node-telegram-bot-api';
 import fetch from 'node-fetch';
 
+if (process.env.RUN_BOT !== 'true') {
+  console.log('Bot deshabilitado en esta instancia. Variable RUN_BOT no está activa.');
+  process.exit(0);
+}
+
 const token = process.env.TELEGRAM_BOT_TOKEN;
 
 if (!token) {
