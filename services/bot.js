@@ -1,0 +1,30 @@
+import TelegramBot from 'node-telegram-bot-api';
+import fetch from 'node-fetch';
+
+const token = process.env.TELEGRAM_BOT_TOKEN;
+
+if (!token) {
+  console.error('❌ TELEGRAM_BOT_TOKEN no está definido');
+  process.exit(1);
+}
+
+const bot = new TelegramBot(token, { polling: true });
+
+bot.onText(/\/top/, async (msg) => {
+  const chatId = msg.chat.id;
+  try {
+    const res = await fetch('http://ligavelocidrone.onrender.com/api/enviar-ranking-telegram');
+    const json = await res.json();
+
+    if (!json.ok) {
+      await bot.sendMessage(chatId, `Error al obtener el ranking: ${json.error || json.message}`);
+      return;
+    }
+
+    await bot.sendMessage(chatId, '✅ Ranking semanal enviado al grupo!');
+  } catch (error) {
+    await bot.sendMessage(chatId, '❌ Error al solicitar el ranking.');
+  }
+});
+
+console.log('🤖 Bot activo, escuchando /top');
