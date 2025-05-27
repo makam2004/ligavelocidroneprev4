@@ -9,6 +9,7 @@ import rankingRoutes from './routes/ranking.js';
 import commitRankingRoutes from './routes/commit_ranking.js';
 import telegramRoutes from './routes/telegram.js';
 import checkMejoras from "./routes/checkMejoras.js";
+import './services/bot.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
