@@ -83,7 +83,7 @@ router.get('/api/enviar-ranking-telegram', async (req, res) => {
       }
     ];
 
-    let mensaje = `🏁 <b>Resultados Semanales - Semana ${semana}</b>
+    let mensaje = `🏁 *Resultados Semanales - Semana ${semana}*
 `;
 
     for (const { url, pestaña } of urls) {
@@ -94,21 +94,20 @@ router.get('/api/enviar-ranking-telegram', async (req, res) => {
         : 'Single Class - Laps';
 
       mensaje += `
-📍 <b>${tipo} - ${escenario} - ${pista}</b>
+📍 *${tipo} - ${escenario} - ${pista}*
 `;
 
       const ordenados = resultados.sort((a, b) => a.tiempo - b.tiempo);
       ordenados.forEach((r, i) => {
         const medalla = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '🍬';
-        mensaje += `${medalla} <b>${r.jugador}</b> — <code>${r.tiempo.toFixed(2)}s</code>
+        mensaje += `${medalla} **${r.jugador}** — \`${r.tiempo.toFixed(2)}s\`
 `;
       });
     }
 
     mensaje += `
-📊 <b>Consulta los rankings completos en:</b>
-` +
-               `➡️ <a href="https://ligavelocidrone.onrender.com/">ligavelocidrone.onrender.com</a>`;
+📊 *Consulta los rankings completos en:*
+➡️ https://ligavelocidrone.onrender.com/`;
 
     const telegramURL = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`;
 
@@ -118,7 +117,7 @@ router.get('/api/enviar-ranking-telegram', async (req, res) => {
       body: JSON.stringify({
         chat_id: process.env.TELEGRAM_CHAT_ID,
         text: mensaje,
-        parse_mode: 'HTML'
+        parse_mode: 'Markdown'
       })
     });
 
