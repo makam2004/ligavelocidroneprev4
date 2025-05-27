@@ -12,6 +12,7 @@
     "@supabase/supabase-js": "^2.39.4",
     "node-fetch": "^3.3.2",
     "express-basic-auth": "^1.2.0",
-    "axios": "^1.6.8"
+    "axios": "^1.6.8",
+    "node-telegram-bot-api": "^0.61.0"
   }
 }
