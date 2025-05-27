@@ -39,7 +39,7 @@ bot.onText(/\/top/, async (msg) => {
 bot.onText(/\/supertop/, async (msg) => {
   const chatId = msg.chat.id;
   try {
-    const res = await fetch('http://ligavelocidrone.onrender.com/api/enviar-ranking-anual');
+    const res = await fetch('https://ligavelocidroneprev2-1.onrender.com/api/enviar-ranking-anual');
     const json = await res.json();
 
     console.log('Respuesta /supertop:', json);
