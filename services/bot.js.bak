@@ -80,10 +80,14 @@ bot.onText(/\/tracks/, async (msg) => {
     }
 
     const texto = 
-      `🏁 <b>Track 1:</b> Race Mode: Single Class - ${json.track1_nombreEscenario}\n` +
-      `<i>${json.track1_nombrePista}</i>\n\n` +
-      `⏱️ <b>Track 2:</b> 3 Lap: Single Class - ${json.track2_nombreEscenario}\n` +
-      `<i>${json.track2_nombrePista}</i>`;
+      `<b>Track 1:</b>\n` +
+      `Race Mode: Single Class\n` +
+      `Escenario: ${json.track1_nombreEscenario}\n` +
+      `Track: ${json.track1_nombrePista}\n\n` +
+      `<b>Track 2:</b>\n` +
+      `3 Lap: Single Class\n` +
+      `Escenario: ${json.track2_nombreEscenario}\n` +
+      `Track: ${json.track2_nombrePista}`;
 
     await bot.sendMessage(chatId, texto, { parse_mode: 'HTML' });
 

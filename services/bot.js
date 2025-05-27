@@ -39,7 +39,7 @@ bot.onText(/\/top/, async (msg) => {
 bot.onText(/\/supertop/, async (msg) => {
   const chatId = msg.chat.id;
   try {
-    const res = await fetch('https://ligavelocidroneprev2-1.onrender.com/api/enviar-ranking-anual');
+    const res = await fetch('https://ligavelocidrone.onrender.com/api/enviar-ranking-anual');
     const json = await res.json();
 
     let dataArray = null;
@@ -70,7 +70,7 @@ bot.onText(/\/supertop/, async (msg) => {
 bot.onText(/\/tracks/, async (msg) => {
   const chatId = msg.chat.id;
   try {
-    const res = await fetch('https://ligavelocidroneprev2-1.onrender.com/api/configuracion');
+    const res = await fetch('https://ligavelocidrone.onrender.com/api/configuracion');
     const json = await res.json();
 
     if (!json || !json.track1_nombreEscenario || !json.track1_nombrePista ||
