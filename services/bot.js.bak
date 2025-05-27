@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
 if (!token) {
-  console.error("❌ TELEGRAM_BOT_TOKEN no está definido");
+  console.error('❌ TELEGRAM_BOT_TOKEN no está definido');
   process.exit(1);
 }
 
@@ -26,4 +26,44 @@ bot.onText(/\/top/, async (msg) => {
   }
 });
 
-console.log("🤖 Bot activo, escuchando /top");
+bot.onText(/\/supertop/, async (msg) => {
+  const chatId = msg.chat.id;
+  try {
+    const res = await fetch('http://ligavelocidrone.onrender.com/api/enviar-ranking-anual');
+    const json = await res.json();
+
+    if (!json.ok) {
+      await bot.sendMessage(chatId, `Error al obtener la clasificación anual: ${json.error || json.message}`);
+      return;
+    }
+
+    await bot.sendMessage(chatId, '✅ Clasificación anual enviada al grupo!');
+  } catch (error) {
+    await bot.sendMessage(chatId, '❌ Error al solicitar la clasificación anual.');
+  }
+});
+
+bot.onText(/\/tracks/, async (msg) => {
+  const chatId = msg.chat.id;
+  try {
+    const res = await fetch('http://ligavelocidrone.onrender.com/api/configuracion');
+    const json = await res.json();
+
+    if (!json) {
+      await bot.sendMessage(chatId, 'No se pudo obtener la configuración actual.');
+      return;
+    }
+
+    const texto = `🎮 Escenarios y Tracks Semanales:\n` +
+      `1️⃣ Escenario 1: ${json.track1_escena}\n` +
+      `   Pista 1: ${json.track1_pista}\n` +
+      `2️⃣ Escenario 2: ${json.track2_escena}\n` +
+      `   Pista 2: ${json.track2_pista}`;
+
+    await bot.sendMessage(chatId, texto);
+  } catch (error) {
+    await bot.sendMessage(chatId, '❌ Error al solicitar los tracks semanales.');
+  }
+});
+
+console.log('🤖 Bot activo, escuchando comandos /top, /supertop y /tracks');

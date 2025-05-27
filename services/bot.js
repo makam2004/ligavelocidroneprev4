@@ -27,4 +27,41 @@ bot.onText(/\/top/, async (msg) => {
   }
 });
 
-console.log('🤖 Bot activo, escuchando /top');
+bot.onText(/\/supertop/, async (msg) => {
+  const chatId = msg.chat.id;
+  try {
+    const res = await fetch('http://ligavelocidrone.onrender.com/api/enviar-ranking-anual');
+    const json = await res.json();
+
+    if (!json.ok) {
+      await bot.sendMessage(chatId, `Error al obtener la clasificación anual: ${json.error || json.message}`);
+      return;
+    }
+
+    await bot.sendMessage(chatId, '✅ Clasificación anual enviada al grupo!');
+  } catch (error) {
+    await bot.sendMessage(chatId, '❌ Error al solicitar la clasificación anual.');
+  }
+});
+
+bot.onText(/\/tracks/, async (msg) => {
+  const chatId = msg.chat.id;
+  try {
+    const res = await fetch('http://ligavelocidrone.onrender.com/api/configuracion');
+    const json = await res.json();
+
+    if (!json) {
+      await bot.sendMessage(chatId, '❌ No se pudo obtener la configuración actual.');
+      return;
+    }
+
+    const texto = `🏁 <b>Track 1:</b> Race Mode: Single Class - ${json.track1_escena} - ${json.track1_pista}\n` +
+                  `⏱️ <b>Track 2:</b> 3 Lap: Single Class - ${json.track2_escena} - ${json.track2_pista}`;
+
+    await bot.sendMessage(chatId, texto, { parse_mode: 'HTML' });
+  } catch (error) {
+    await bot.sendMessage(chatId, '❌ Error al solicitar los tracks semanales.');
+  }
+});
+
+console.log('🤖 Bot activo, escuchando comandos /top, /supertop y /tracks');
