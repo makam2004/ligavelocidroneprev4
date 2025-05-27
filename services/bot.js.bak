@@ -52,16 +52,17 @@ bot.onText(/\/supertop/, async (msg) => {
       dataArray = json;
     }
 
-    if (!dataArray) {
-      await bot.sendMessage(chatId, `Error: datos inválidos recibidos del servidor.`);
+    if (!dataArray || !Array.isArray(dataArray)) {
+      await bot.sendMessage(chatId, '⚠️ La clasificación anual está vacía o no disponible.');
       return;
     }
 
-    const texto = dataArray.map((jugador, i) =>
-      `${i + 1}º - ${jugador.nombre}: ${jugador.puntos_anuales} pts`
-    ).join('\n');
+    const texto = dataArray.map((jugador, i) => {
+      const medalla = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '🎖️';
+      return `${medalla} <b>${jugador.nombre}</b> — <i>${jugador.puntos_anuales} pts</i>`;
+    }).join('\n');
 
-    await bot.sendMessage(chatId, `<b>Clasificación Anual</b>:\n${texto}`, { parse_mode: 'HTML' });
+    await bot.sendMessage(chatId, `<b>🏆 Clasificación Anual 🏆</b>\n\n${texto}`, { parse_mode: 'HTML' });
 
   } catch (error) {
     console.error('Error al obtener ranking anual:', error);
@@ -75,8 +76,10 @@ bot.onText(/\/tracks/, async (msg) => {
     const res = await fetch('http://ligavelocidrone.onrender.com/api/configuracion');
     const json = await res.json();
 
-    if (!json) {
-      await bot.sendMessage(chatId, '❌ No se pudo obtener la configuración actual.');
+    console.log('/tracks respuesta:', json);
+
+    if (!json || !json.track1_escena || !json.track1_pista || !json.track2_escena || !json.track2_pista) {
+      await bot.sendMessage(chatId, '⚠️ Configuración de tracks no encontrada o incompleta.');
       return;
     }
 
@@ -84,7 +87,9 @@ bot.onText(/\/tracks/, async (msg) => {
                   `⏱️ <b>Track 2:</b> 3 Lap: Single Class - ${json.track2_escena} - ${json.track2_pista}`;
 
     await bot.sendMessage(chatId, texto, { parse_mode: 'HTML' });
+
   } catch (error) {
+    console.error('Error en /tracks:', error);
     await bot.sendMessage(chatId, '❌ Error al solicitar los tracks semanales.');
   }
 });
