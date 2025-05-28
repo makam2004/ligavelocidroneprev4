@@ -1,118 +1,49 @@
 import TelegramBot from 'node-telegram-bot-api';
-import fetch from 'node-fetch';
+import dotenv from 'dotenv';
+import { getTopRanking, getTracksActuales } from '../routes/tiemposMejorados.js'; // Rutas existentes
 
-// Bot 1 (principal)
-const token = process.env.TELEGRAM_BOT_TOKEN;
-const chatId = process.env.TELEGRAM_CHAT_ID;
+dotenv.config();
 
-// Bot 2 (secundario)
-const token1 = process.env.TELEGRAM_BOT_TOKEN1;
-const chatId1 = process.env.TELEGRAM_CHAT_ID1;
-const threadId1 = 4;
-
-if (!token || !token1) {
-  console.error('❌ Algún token de bot de Telegram no está definido.');
-  process.exit(1);
-}
-
-const bot = new TelegramBot(token, { polling: true });
-const bot2 = new TelegramBot(token1, { polling: false }); // segundo bot sin polling
-
-const enviarAmbos = async (mensaje, opciones = {}) => {
-  try {
-    await bot.sendMessage(chatId, mensaje, opciones);
-    await bot2.sendMessage(chatId1, mensaje, { ...opciones, message_thread_id: threadId1 });
-  } catch (err) {
-    console.error('❌ Error al enviar a uno de los grupos:', err);
-  }
-};
-
-bot.on('polling_error', (error) => {
-  if (error.code === 'ETELEGRAM' && error.message.includes('409')) {
-    console.error('Conflicto 409 detectado. Cerrando bot para evitar múltiples instancias.');
-    process.exit(1);
-  } else {
-    console.error('Error de polling:', error);
-  }
-});
+const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN1, { polling: true });
 
 bot.onText(/\/top/, async () => {
   try {
-    const res = await fetch('http://ligavelocidrone.onrender.com/api/enviar-ranking-telegram');
-    const json = await res.json();
+    const ranking = await getTopRanking();
 
-    if (!json.ok) {
-      await enviarAmbos(`❌ Error al obtener el ranking: ${json.error || json.message}`);
-      return;
-    }
+    let mensaje = '📊 *Ranking Semanal:*\n\n';
+    ranking.forEach((jugador, index) => {
+      const icono = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🍬';
+      mensaje += `${icono} *${jugador.nombre}* - ${jugador.puntos} pts\n`;
+    });
 
-    await enviarAmbos('✅ Ranking semanal enviado al grupo!');
+    await bot.sendMessage(process.env.TELEGRAM_CHAT_ID1, mensaje, {
+      parse_mode: 'Markdown',
+      message_thread_id: 4
+    });
   } catch (error) {
-    await enviarAmbos('❌ Error al solicitar el ranking semanal.');
-  }
-});
-
-bot.onText(/\/supertop/, async () => {
-  try {
-    const res = await fetch('https://ligavelocidrone.onrender.com/api/enviar-ranking-anual');
-    const json = await res.json();
-
-    const dataArray = Array.isArray(json?.data) ? json.data : (Array.isArray(json) ? json : null);
-
-    if (!dataArray) {
-      await enviarAmbos('⚠️ La clasificación anual está vacía o no disponible.');
-      return;
-    }
-
-    const texto = dataArray.map((jugador, i) => {
-      const medalla = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '🍬';
-      return `${medalla} <b>${jugador.nombre}</b> — <i>${jugador.puntos_anuales} pts</i>`;
-    }).join('\n');
-
-    await enviarAmbos(`<b>🏆 Clasificación Anual 🏆</b>\n\n${texto}`, { parse_mode: 'HTML' });
-
-  } catch (error) {
-    await enviarAmbos('❌ Error al solicitar la clasificación anual.');
+    console.error('❌ Error en /top:', error.message);
   }
 });
 
 bot.onText(/\/tracks/, async () => {
   try {
-    const res = await fetch('https://ligavelocidrone.onrender.com/api/configuracion');
-    const json = await res.json();
+    const tracks = await getTracksActuales();
 
-    if (!json?.track1_nombreEscenario || !json?.track1_nombrePista || !json?.track2_nombreEscenario || !json?.track2_nombrePista) {
-      await enviarAmbos('⚠️ Configuración de tracks no encontrada o incompleta.');
-      return;
-    }
+    let mensaje = '🏁 *Tracks actuales:*\n\n';
+    tracks.forEach((track, index) => {
+      const encabezado = index === 0
+        ? '*Single Class - Laps -*'
+        : '*Single Class - Three Lap Race -*';
+      mensaje += `${encabezado}\n🏟️ *Escenario:* ${track.escenario}\n🛣️ *Track:* ${track.nombre}\n\n`;
+    });
 
-    const texto =
-      `<b>Track 1:</b>\n` +
-      `Race Mode: Single Class\n` +
-      `Escenario: ${json.track1_nombreEscenario}\n` +
-      `Track: ${json.track1_nombrePista}\n\n` +
-      `<b>Track 2:</b>\n` +
-      `Race Mode: Three Lap Race\n` +
-      `Escenario: ${json.track2_nombreEscenario}\n` +
-      `Track: ${json.track2_nombrePista}`;
-
-    await enviarAmbos(texto, { parse_mode: 'HTML' });
-
+    await bot.sendMessage(process.env.TELEGRAM_CHAT_ID1, mensaje, {
+      parse_mode: 'Markdown',
+      message_thread_id: 4
+    });
   } catch (error) {
-    await enviarAmbos('❌ Error al solicitar los tracks semanales.');
+    console.error('❌ Error en /tracks:', error.message);
   }
 });
 
-bot.onText(/\/help/, async () => {
-  const texto =
-    `<b>🤖 Comandos disponibles:</b>\n\n` +
-    `<b>/top</b> - Envía el ranking semanal al grupo.\n` +
-    `<b>/supertop</b> - Muestra la clasificación anual actual.\n` +
-    `<b>/tracks</b> - Muestra los escenarios y nombres de pista semanales.\n` +
-    `<b>/help</b> - Muestra esta ayuda.\n\n` +
-    `Usa los comandos escribiéndolos en el chat, por ejemplo: <code>/top</code>`;
-
-  await bot.sendMessage(chatId, texto, { parse_mode: 'HTML' });
-});
-
-console.log('🤖 Bot activo escuchando comandos y enviando a dos grupos');
+export default bot;
