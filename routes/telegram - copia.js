@@ -1,3 +1,4 @@
+
 import express from 'express';
 import fetch from 'node-fetch';
 import supabase from '../supabaseClient.js';
@@ -82,7 +83,8 @@ router.get('/api/enviar-ranking-telegram', async (req, res) => {
       }
     ];
 
-    let mensaje = `🏁 <b>Resultados Semanales - Semana ${semana}</b>\n`;
+    let mensaje = `🏁 <b>Resultados Semanales - Semana ${semana}</b>
+`;
 
     for (const { url, pestaña } of urls) {
       const { pista, escenario, resultados } = await obtenerResultados(url, nombresJugadores, pestaña);
@@ -91,20 +93,26 @@ router.get('/api/enviar-ranking-telegram', async (req, res) => {
         ? 'Single Class - Three Lap Race'
         : 'Single Class - Laps';
 
-      mensaje += `\n📍 <b>${tipo} - ${escenario} - ${pista}</b>\n`;
+      mensaje += `
+📍 <b>${tipo} - ${escenario} - ${pista}</b>
+`;
 
       const ordenados = resultados.sort((a, b) => a.tiempo - b.tiempo);
       ordenados.forEach((r, i) => {
         const medalla = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '🍬';
-        mensaje += `${medalla} <b>${r.jugador}</b> — <code>${r.tiempo.toFixed(2)}s</code>\n`;
+        mensaje += `${medalla} <b>${r.jugador}</b> — <code>${r.tiempo.toFixed(2)}s</code>
+`;
       });
     }
 
-    mensaje += `\n📊 <b>Consulta los rankings completos en:</b>\n` +
+    mensaje += `
+📊 <b>Consulta los rankings completos en:</b>
+` +
                `➡️ <a href="https://ligavelocidrone.onrender.com/">ligavelocidrone.onrender.com</a>`;
 
-    // Primer envío
-    const response1 = await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+    const telegramURL = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+    const response = await fetch(telegramURL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -114,23 +122,8 @@ router.get('/api/enviar-ranking-telegram', async (req, res) => {
       })
     });
 
-    const json1 = await response1.json();
-    if (!json1.ok) throw new Error('Telegram error (grupo principal): ' + json1.description);
-
-    // Segundo envío con hilo (thread)
-    const response2 = await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN1}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: process.env.TELEGRAM_CHAT_ID1,
-        message_thread_id: 4,
-        text: mensaje,
-        parse_mode: 'HTML'
-      })
-    });
-
-    const json2 = await response2.json();
-    if (!json2.ok) throw new Error('Telegram error (grupo 2): ' + json2.description);
+    const json = await response.json();
+    if (!json.ok) throw new Error('Telegram error: ' + json.description);
 
     res.json({ ok: true, enviado: true });
   } catch (err) {
