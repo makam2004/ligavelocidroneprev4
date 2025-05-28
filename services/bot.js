@@ -59,7 +59,7 @@ bot.onText(/\/tracks/, async (msg) => {
 
     if (!json || !json.track1_nombreEscenario || !json.track1_nombrePista ||
         !json.track2_nombreEscenario || !json.track2_nombrePista) {
-      await bot.sendMessage(chatId, '⚠️ Configuración de tracks no encontrada o incompleta.', { message_thread_id: 4 });
+      await bot.sendMessage(chatId, '⚠️ Configuración de tracks no encontrada o incompleta.', { message_thread_id: 3 });
       return;
     }
 
@@ -73,15 +73,17 @@ bot.onText(/\/tracks/, async (msg) => {
       `Escenario: ${json.track2_nombreEscenario}\n` +
       `Track: ${json.track2_nombrePista}`;
 
-    await bot.sendMessage(chatId, texto, { parse_mode: 'HTML', message_thread_id: 4 });
+    await bot.sendMessage(chatId, texto, { parse_mode: 'HTML', message_thread_id: 3 });
 
   } catch (error) {
-    await bot.sendMessage(chatId, '❌ Error al solicitar los tracks semanales.', { message_thread_id: 4 });
+    await bot.sendMessage(chatId, '❌ Error al solicitar los tracks semanales.', { message_thread_id: 3 });
   }
 });
 
 bot.onText(/\/help/, async (msg) => {
   const chatId = msg.chat.id;
+  const threadId = msg.message_thread_id;
+
   const texto =
     `<b>🤖 Comandos disponibles:</b>\n\n` +
     `<b>/top</b> - Envía el ranking semanal al grupo.\n` +
@@ -90,7 +92,12 @@ bot.onText(/\/help/, async (msg) => {
     `<b>/help</b> - Muestra esta ayuda.\n\n` +
     `Usa los comandos escribiéndolos en el chat, por ejemplo: <code>/top</code>`;
 
-  await bot.sendMessage(chatId, texto, { parse_mode: 'HTML', message_thread_id: 4 });
+  const opciones = { parse_mode: 'HTML' };
+  if (threadId !== undefined) {
+    opciones.message_thread_id = threadId;
+  }
+
+  await bot.sendMessage(chatId, texto, opciones);
 });
 
 console.log('🤖 Bot activo, escuchando comandos /top, /supertop, /tracks y /help');
