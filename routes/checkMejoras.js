@@ -8,6 +8,7 @@ const router = express.Router();
 router.get("/api/check-mejoras", async (req, res) => {
   try {
     const datos = await tiemposMejorados();
+    console.log("Datos recibidos de tiemposMejorados:", datos);
     const mejorasDetectadas = [];
 
     for (const registro of datos) {
@@ -44,25 +45,22 @@ router.get("/api/check-mejoras", async (req, res) => {
     }
 
     for (const mejora of mejorasDetectadas) {
-      const mensaje = `⏱️ Nueva mejora de tiempo en el *${mejora.track}*\\n` +
-                      `👤 *Piloto*: ${mejora.piloto}\\n` +
-                      `🔻 *Tiempo anterior*: ${mejora.tiempoAnterior.toFixed(2)} s\\n` +
-                      `✅ *Nuevo tiempo*: ${mejora.tiempoNuevo.toFixed(2)} s\\n` +
+      const mensaje = `⏱️ *Nueva mejora de tiempo en el ${mejora.track}*\n` +
+                      `👤 *Piloto*: ${mejora.piloto}\n` +
+                      `🔻 *Tiempo anterior*: ${mejora.tiempoAnterior.toFixed(2)} s\n` +
+                      `✅ *Nuevo tiempo*: ${mejora.tiempoNuevo.toFixed(2)} s\n` +
                       `📅 ${new Date().toLocaleString("es-ES")}`;
 
-      // Destinos múltiples
-      const destinos = [
-        { token: process.env.TELEGRAM_TOKEN, chat_id: process.env.TELEGRAM_CHAT_ID },
-        { token: process.env.TELEGRAM_BOT_TOKEN1, chat_id: process.env.TELEGRAM_CHAT_ID1, message_thread_id: 4 }
-      ];
-
-      for (const destino of destinos) {
-        await axios.post(`https://api.telegram.org/bot${destino.token}/sendMessage`, {
-          chat_id: destino.chat_id,
+      try {
+        console.log("Enviando mensaje al grupo 2 de Telegram:", mensaje);
+        await axios.post(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN1}/sendMessage`, {
+          chat_id: process.env.TELEGRAM_CHAT_ID1,
           text: mensaje,
           parse_mode: "Markdown",
-          message_thread_id: destino.message_thread_id
+          message_thread_id: 4
         });
+      } catch (e) {
+        console.error("❌ Error enviando a grupo 2:", e.response?.data || e.message);
       }
     }
 
