@@ -1,23 +1,7 @@
 import TelegramBot from 'node-telegram-bot-api';
 import fetch from 'node-fetch';
 
-const token = process.env.TELEGRAM_BOT_TOKEN1;
-
-if (!token) {
-  console.error('❌ TELEGRAM_BOT_TOKEN1 no está definido');
-  process.exit(1);
-}
-
-const bot = new TelegramBot(token, { polling: true });
-
-bot.on('polling_error', (error) => {
-  if (error.code === 'ETELEGRAM' && error.message.includes('409')) {
-    console.error('Conflicto 409 detectado. Cerrando bot para evitar múltiples instancias.');
-    process.exit(1);
-  } else {
-    console.error('Error de polling:', error);
-  }
-});
+const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN1, { polling: true });
 
 bot.onText(/\/top/, async (msg) => {
   const chatId = msg.chat.id;
@@ -26,13 +10,13 @@ bot.onText(/\/top/, async (msg) => {
     const json = await res.json();
 
     if (!json.ok) {
-      await bot.sendMessage(chatId, `Error al obtener el ranking: ${json.error || json.message}`);
+      await bot.sendMessage(chatId, `Error al obtener el ranking: ${json.error || json.message}`, { message_thread_id: 4 });
       return;
     }
 
-    await bot.sendMessage(chatId, '✅ Ranking semanal enviado al grupo!');
+    await bot.sendMessage(chatId, '✅ Ranking semanal enviado al grupo!', { message_thread_id: 4 });
   } catch (error) {
-    await bot.sendMessage(chatId, '❌ Error al solicitar el ranking.');
+    await bot.sendMessage(chatId, '❌ Error al solicitar el ranking.', { message_thread_id: 4 });
   }
 });
 
@@ -51,7 +35,7 @@ bot.onText(/\/supertop/, async (msg) => {
     }
 
     if (!dataArray || !Array.isArray(dataArray)) {
-      await bot.sendMessage(chatId, '⚠️ La clasificación anual está vacía o no disponible.');
+      await bot.sendMessage(chatId, '⚠️ La clasificación anual está vacía o no disponible.', { message_thread_id: 4 });
       return;
     }
 
@@ -60,10 +44,10 @@ bot.onText(/\/supertop/, async (msg) => {
       return `${medalla} <b>${jugador.nombre}</b> — <i>${jugador.puntos_anuales} pts</i>`;
     }).join('\n');
 
-    await bot.sendMessage(chatId, `<b>🏆 Clasificación Anual 🏆</b>\n\n${texto}`, { parse_mode: 'HTML' });
+    await bot.sendMessage(chatId, `<b>🏆 Clasificación Anual 🏆</b>\n\n${texto}`, { parse_mode: 'HTML', message_thread_id: 4 });
 
   } catch (error) {
-    await bot.sendMessage(chatId, '❌ Error al solicitar la clasificación anual.');
+    await bot.sendMessage(chatId, '❌ Error al solicitar la clasificación anual.', { message_thread_id: 4 });
   }
 });
 
@@ -75,7 +59,7 @@ bot.onText(/\/tracks/, async (msg) => {
 
     if (!json || !json.track1_nombreEscenario || !json.track1_nombrePista ||
         !json.track2_nombreEscenario || !json.track2_nombrePista) {
-      await bot.sendMessage(chatId, '⚠️ Configuración de tracks no encontrada o incompleta.');
+      await bot.sendMessage(chatId, '⚠️ Configuración de tracks no encontrada o incompleta.', { message_thread_id: 4 });
       return;
     }
 
@@ -89,10 +73,10 @@ bot.onText(/\/tracks/, async (msg) => {
       `Escenario: ${json.track2_nombreEscenario}\n` +
       `Track: ${json.track2_nombrePista}`;
 
-    await bot.sendMessage(chatId, texto, { parse_mode: 'HTML' });
+    await bot.sendMessage(chatId, texto, { parse_mode: 'HTML', message_thread_id: 4 });
 
   } catch (error) {
-    await bot.sendMessage(chatId, '❌ Error al solicitar los tracks semanales.');
+    await bot.sendMessage(chatId, '❌ Error al solicitar los tracks semanales.', { message_thread_id: 4 });
   }
 });
 
@@ -106,7 +90,7 @@ bot.onText(/\/help/, async (msg) => {
     `<b>/help</b> - Muestra esta ayuda.\n\n` +
     `Usa los comandos escribiéndolos en el chat, por ejemplo: <code>/top</code>`;
 
-  await bot.sendMessage(chatId, texto, { parse_mode: 'HTML' });
+  await bot.sendMessage(chatId, texto, { parse_mode: 'HTML', message_thread_id: 4 });
 });
 
 console.log('🤖 Bot activo, escuchando comandos /top, /supertop, /tracks y /help');
