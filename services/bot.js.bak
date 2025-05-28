@@ -82,6 +82,8 @@ bot.onText(/\/tracks/, async (msg) => {
 
 bot.onText(/\/help/, async (msg) => {
   const chatId = msg.chat.id;
+  const threadId = msg.message_thread_id;
+
   const texto =
     `<b>🤖 Comandos disponibles:</b>\n\n` +
     `<b>/top</b> - Envía el ranking semanal al grupo.\n` +
@@ -90,7 +92,12 @@ bot.onText(/\/help/, async (msg) => {
     `<b>/help</b> - Muestra esta ayuda.\n\n` +
     `Usa los comandos escribiéndolos en el chat, por ejemplo: <code>/top</code>`;
 
-  await bot.sendMessage(chatId, texto, { parse_mode: 'HTML', message_thread_id: 4 });
+  const opciones = { parse_mode: 'HTML' };
+  if (threadId !== undefined) {
+    opciones.message_thread_id = threadId;
+  }
+
+  await bot.sendMessage(chatId, texto, opciones);
 });
 
 console.log('🤖 Bot activo, escuchando comandos /top, /supertop, /tracks y /help');
