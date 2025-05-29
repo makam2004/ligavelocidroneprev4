@@ -3,7 +3,7 @@ import supabase from '../supabaseClient.js';
 
 const router = express.Router();
 
-router.get('/api/ranking-anual', async (_req, res) => {
+router.get('/api/enviar-ranking-anual', async (_req, res) => {
   try {
     // Fallback manual (sin JOIN Supabase)
     const { data: jugadores } = await supabase.from('jugadores').select('id, nombre');
