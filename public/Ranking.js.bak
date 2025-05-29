@@ -11,21 +11,10 @@ async function cargarRankingAnual() {
     return;
   }
 
-  if (!Array.isArray(data)) {
-    console.error("Datos de ranking anual no son un array:", data);
-    return;
-  }
-
   const tabla = document.getElementById("ranking-anual-body");
   if (!tabla) return;
 
   tabla.innerHTML = "";
-
-  if (data.length === 0) {
-    tabla.innerHTML = "<tr><td colspan='2'>No hay datos disponibles.</td></tr>";
-    return;
-  }
-
   data.forEach(jugador => {
     const fila = document.createElement("tr");
     fila.innerHTML = `
