@@ -29,7 +29,7 @@ function calcularSemanaActual() {
 }
 
 // /top → ranking semanal completo, siempre en thread_id = 4
-bot.onText(/\/top/, async () => {
+bot.onText(/\/top/, async (msg) => {
   const threadId = 4;
   try {
     const res = await fetch('https://ligavelocidrone.onrender.com/api/tiempos-mejorados');
@@ -72,7 +72,7 @@ bot.onText(/\/top/, async () => {
 });
 
 // /supertop → clasificación anual, siempre en thread_id = 4
-bot.onText(/\/supertop/, async () => {
+bot.onText(/\/supertop/, async (msg) => {
   const threadId = 4;
   try {
     const res = await fetch('https://ligavelocidrone.onrender.com/api/enviar-ranking-anual');
@@ -114,7 +114,7 @@ bot.onText(/\/supertop/, async () => {
 });
 
 // /tracks → configuración de tracks semanales, siempre en thread_id = 3
-bot.onText(/\/tracks/, async () => {
+bot.onText(/\/tracks/, async (msg) => {
   const threadId = 3;
   try {
     const res = await fetch('https://ligavelocidrone.onrender.com/api/configuracion');
@@ -158,7 +158,7 @@ bot.onText(/\/tracks/, async () => {
 
 // /help → listado de comandos en el mismo hilo que se ejecuta
 bot.onText(/\/help/, async (msg) => {
-  const threadId = msg.message_thread_id || DEFAULT_THREAD_ID;
+  const threadId = msg.message_thread_id; // solo usa el hilo actual
   const texto =
     `<b>🤖 Comandos disponibles:</b>\n\n` +
     `<b>/top</b> - Envía el ranking semanal completo (todos los pilotos con sus tiempos).\n` +
@@ -167,10 +167,11 @@ bot.onText(/\/help/, async (msg) => {
     `<b>/help</b> - Muestra esta ayuda.\n\n` +
     `Para ejecutar un comando, escríbelo en este hilo.`;
 
-  await bot.sendMessage(CHAT_ID, texto, {
-    parse_mode: 'HTML',
-    message_thread_id: threadId
-  });
+  const options = { parse_mode: 'HTML' };
+  if (threadId !== undefined) {
+    options.message_thread_id = threadId;
+  }
+  await bot.sendMessage(CHAT_ID, texto, options);
   console.log('✅ /help enviado a grupo', CHAT_ID, 'en hilo', threadId);
 });
 
