@@ -42,20 +42,24 @@ function mostrarAlta() {
   if (window.hcaptcha) hcaptcha.reset();
 }
 
+
 function cerrarPopups() {
   const popup = document.getElementById('popup');
   const popupAlta = document.getElementById('popupAlta');
+  const popupTips = document.getElementById('popupTips');
   const overlay = document.getElementById('overlay');
   const mensajeAlta = document.getElementById('mensajeAlta');
   const nombreJugador = document.getElementById('nombreJugador');
 
-  if (popup) popup.style.display = 'none';
-  if (popupAlta) popupAlta.style.display = 'none';
-  if (overlay) overlay.style.display = 'none';
+  if (popup)       popup.style.display = 'none';
+  if (popupAlta)   popupAlta.style.display = 'none';
+  if (popupTips)   popupTips.style.display = 'none';
+  if (overlay)     overlay.style.display = 'none';
   if (mensajeAlta) mensajeAlta.textContent = '';
   if (nombreJugador) nombreJugador.value = '';
   if (window.hcaptcha) hcaptcha.reset();
 }
+
 
 async function registrarJugador(event) {
   event.preventDefault();
@@ -95,6 +99,9 @@ async function cargarMejoras() {
   try {
     const res = await fetch('/api/tiempos-mejorados');
     const data = await res.json();
+
+    if (!Array.isArray(data)) throw new Error("Datos no válidos");
+
     contenedor.innerHTML = '';
 
     const ranking = {};
@@ -105,7 +112,8 @@ async function cargarMejoras() {
       card.classList.add('card');
 
       const titulo = document.createElement('h3');
-      titulo.innerHTML = `<span style="color:red">${pista.pestaña}</span><br>${pista.escenario} - ${pista.pista}`;
+      const pestaña = idx === 0 ? "Race Mode: Single Class" : "3 Lap: Single Class";
+      titulo.innerHTML = `<span style="color:red">${pestaña}</span><br>${pista.escenario} - ${pista.pista}`;
       card.appendChild(titulo);
 
       const tabla = document.createElement('table');
@@ -141,6 +149,8 @@ async function cargarRankingAnual() {
   try {
     const res = await fetch('/api/ranking-anual');
     const data = await res.json();
+
+    if (!Array.isArray(data)) throw new Error("Ranking anual inválido");
 
     const html = data.map((r, i) =>
       `<tr><td>${i + 1}</td><td>${r.nombre}</td><td>${r.puntos}</td></tr>`

@@ -147,7 +147,7 @@ async function cargarMejoras() {
 
 async function cargarRankingAnual() {
   try {
-    const res = await fetch('/api/ranking-anual');
+    const res = await fetch('/api/enviar-ranking-anual');
     const data = await res.json();
 
     if (!Array.isArray(data)) throw new Error("Ranking anual inválido");
