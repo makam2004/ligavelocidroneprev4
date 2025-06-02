@@ -64,7 +64,7 @@
     </div>
   </div>
 
-  <div class="overlay" id="overlay" onclick="cerrarPopups()"></div>
+  <div id="overlay" class="overlay" onclick="cerrarPopups()"></div>
 
   <div class="container">
     <div id="mejoras" class="track-row">⏳ Leyendo resultados...</div>
@@ -78,11 +78,16 @@
         <table>
           <thead>
             <tr>
+              <th>#</th>
               <th>Piloto</th>
               <th>Puntos</th>
             </tr>
           </thead>
-          <tbody id="ranking-anual-body"></tbody>
+          <tbody id="ranking-anual-body">
+            <tr>
+              <td colspan="3">Cargando ranking anual…</td>
+            </tr>
+          </tbody>
         </table>
       </div>
     </div>
@@ -99,7 +104,13 @@
     <h3>Alta de piloto</h3>
     <button onclick="cerrarPopups()" style="float:right;">✖</button>
     <form onsubmit="registrarJugador(event)">
-      <input id="nombreJugador" type="text" placeholder="Nombre del Piloto en Velocidrone" required style="width:100%;padding:10px;margin-top:10px;" />
+      <input
+        id="nombreJugador"
+        type="text"
+        placeholder="Nombre del Piloto en Velocidrone"
+        required
+        style="width:100%;padding:10px;margin-top:10px;"
+      />
       <div class="h-captcha" data-sitekey="8ac62e84-891a-4d2e-b8a0-e39aabb4b246"></div>
       <button type="submit" style="margin-top:10px;">Registrar</button>
     </form>
@@ -116,7 +127,7 @@
     function cerrarPopups() {
       ['popup', 'popupAlta', 'popupTips', 'overlay'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.style.display = "none";
+        if (el) el.style.display = 'none';
       });
     }
   </script>

@@ -42,7 +42,6 @@ function mostrarAlta() {
   if (window.hcaptcha) hcaptcha.reset();
 }
 
-
 function cerrarPopups() {
   const popup = document.getElementById('popup');
   const popupAlta = document.getElementById('popupAlta');
@@ -59,7 +58,6 @@ function cerrarPopups() {
   if (nombreJugador) nombreJugador.value = '';
   if (window.hcaptcha) hcaptcha.reset();
 }
-
 
 async function registrarJugador(event) {
   event.preventDefault();
@@ -148,22 +146,28 @@ async function cargarMejoras() {
 async function cargarRankingAnual() {
   try {
     const res = await fetch('/api/enviar-ranking-anual');
-    const data = await res.json();
+    const json = await res.json();
 
-    if (!Array.isArray(data)) throw new Error("Ranking anual inválido");
+    // Verificamos que el servidor devolvió { ok: true, data: [...] }
+    if (!json.ok || !Array.isArray(json.data)) {
+      throw new Error(json.error || 'Formato de respuesta inesperado');
+    }
 
-    const html = data.map((r, i) =>
-      `<tr><td>${i + 1}</td><td>${r.nombre}</td><td>${r.puntos}</td></tr>`
+    // Construimos las filas en base a json.data
+    const filas = json.data.map((r, i) =>
+      `<tr><td>${i + 1}</td><td>${r.nombre}</td><td>${r.puntos_anuales}</td></tr>`
     ).join('');
 
-    const tabla = document.querySelector('#rankingAnual .resultado');
-    if (tabla) {
-      tabla.innerHTML =
-        `<table><thead><tr><th>#</th><th>Piloto</th><th>Puntos</th></tr></thead><tbody>${html}</tbody></table>`;
+    // Inyectamos en el <tbody id="ranking-anual-body">
+    const body = document.getElementById('ranking-anual-body');
+    if (body) {
+      body.innerHTML = filas;
     }
   } catch (err) {
     console.error('Error al cargar ranking anual:', err);
-    const tabla = document.querySelector('#rankingAnual .resultado');
-    if (tabla) tabla.innerHTML = '<p>Error</p>';
+    const body = document.getElementById('ranking-anual-body');
+    if (body) {
+      body.innerHTML = `<tr><td colspan="3" style="color:red;">No se pudo cargar el ranking anual.</td></tr>`;
+    }
   }
 }
