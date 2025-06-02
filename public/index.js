@@ -8,7 +8,7 @@ import adminRoutes from './routes/admin.js';
 import tiemposMejorados from './routes/tiemposMejorados.js';
 import rankingRoutes from './routes/ranking.js';
 import rankingAnualRoutes from './routes/rankingAnual.js';
-import supabase from './supabaseClient.js'; // (import sólo si lo usas aquí directamente)
+import supabase from '../supabaseClient.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
