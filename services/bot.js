@@ -10,7 +10,6 @@ if (!BOT_TOKEN || !CHAT_ID) {
   process.exit(1);
 }
 
-// Inicializamos el bot en modo polling
 const bot = new TelegramBot(BOT_TOKEN, { polling: true });
 
 bot.on('polling_error', (error) => {
@@ -22,7 +21,6 @@ bot.on('polling_error', (error) => {
   }
 });
 
-// Función auxiliar para calcular semana actual
 function calcularSemanaActual() {
   const fecha = new Date();
   const inicio = new Date(fecha.getFullYear(), 0, 1);
@@ -30,10 +28,8 @@ function calcularSemanaActual() {
   return Math.ceil((dias + inicio.getDay() + 1) / 7);
 }
 
-// Comando /top → envía el ranking semanal (TOP 3 de cada pista)
 bot.onText(/\/top/, async () => {
   try {
-    // 1) Obtenemos los datos de /api/tiempos-mejorados
     const res = await fetch('https://ligavelocidrone.onrender.com/api/tiempos-mejorados');
     const data = await res.json();
 
@@ -41,7 +37,6 @@ bot.onText(/\/top/, async () => {
       throw new Error('Formato de datos de tiempos no válido');
     }
 
-    // 2) Constrimos el mensaje con TOP 3 de cada pista
     const semana = calcularSemanaActual();
     let mensaje = `🏁 <b>Resultados Semanales - Semana ${semana}</b>\n`;
 
@@ -50,14 +45,12 @@ bot.onText(/\/top/, async () => {
         ? 'Track 1 – Race Mode: Single Class'
         : 'Track 2 – 3 Lap: Single Class';
       mensaje += `\n📍 <b>${encabezado}</b>\n`;
-      // Tomamos los 3 primeros resultados
       pistaObj.resultados.slice(0, 3).forEach((r, i) => {
         mensaje += `${i + 1}. <b>${r.jugador}</b> — <code>${r.tiempo.toFixed(2)} s</code>\n`;
       });
       mensaje += '\n';
     });
 
-    // 3) Enviamos el mensaje a CHAT_ID
     await bot.sendMessage(CHAT_ID, mensaje, { parse_mode: 'HTML' });
     console.log('✅ /top enviado a grupo', CHAT_ID);
   } catch (error) {
@@ -66,10 +59,8 @@ bot.onText(/\/top/, async () => {
   }
 });
 
-// Comando /supertop → envía la clasificación anual
 bot.onText(/\/supertop/, async () => {
   try {
-    // 1) Obtenemos los datos de /api/enviar-ranking-anual
     const res = await fetch('https://ligavelocidrone.onrender.com/api/enviar-ranking-anual');
     const json = await res.json();
 
@@ -85,7 +76,6 @@ bot.onText(/\/supertop/, async () => {
       return;
     }
 
-    // 2) Construimos el texto con medallas
     const encabezado = `<b>🏆 Clasificación Anual 🏆</b>\n\n`;
     const lineas = dataArray.map((jugador, i) => {
       const medalla = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '🎖️';
@@ -94,7 +84,6 @@ bot.onText(/\/supertop/, async () => {
 
     const mensaje = encabezado + lineas;
 
-    // 3) Enviamos el mensaje a CHAT_ID
     await bot.sendMessage(CHAT_ID, mensaje, { parse_mode: 'HTML' });
     console.log('✅ /supertop enviado a grupo', CHAT_ID);
   } catch (error) {
@@ -103,25 +92,23 @@ bot.onText(/\/supertop/, async () => {
   }
 });
 
-// Comando /tracks → envía la configuración de los tracks semanales
 bot.onText(/\/tracks/, async () => {
   try {
-    // 1) Obtenemos los datos de /api/configuracion
     const res = await fetch('https://ligavelocidrone.onrender.com/api/configuracion');
     const json = await res.json();
 
-    if (!json
-      || !json.track1_nombreEscenario
-      || !json.track1_nombrePista
-      || !json.track2_nombreEscenario
-      || !json.track2_nombrePista
+    if (
+      !json ||
+      !json.track1_nombreEscenario ||
+      !json.track1_nombrePista ||
+      !json.track2_nombreEscenario ||
+      !json.track2_nombrePista
     ) {
       await bot.sendMessage(CHAT_ID, '⚠️ Configuración de tracks no encontrada o incompleta.');
       return;
     }
 
-    // 2) Construimos el texto con la info de los tracks
-    const texto = 
+    const texto =
       `<b>Track 1:</b>\n` +
       `Race Mode: Single Class\n` +
       `Escenario: ${json.track1_nombreEscenario}\n` +
@@ -131,7 +118,6 @@ bot.onText(/\/tracks/, async () => {
       `Escenario: ${json.track2_nombreEscenario}\n` +
       `Track: ${json.track2_nombrePista}`;
 
-    // 3) Enviamos el mensaje a CHAT_ID
     await bot.sendMessage(CHAT_ID, texto, { parse_mode: 'HTML' });
     console.log('✅ /tracks enviado a grupo', CHAT_ID);
   } catch (error) {
@@ -140,7 +126,6 @@ bot.onText(/\/tracks/, async () => {
   }
 });
 
-// Comando /help → envía la lista de comandos disponibles
 bot.onText(/\/help/, async () => {
   const texto =
     `<b>🤖 Comandos disponibles:</b>\n\n` +
@@ -154,11 +139,4 @@ bot.onText(/\/help/, async () => {
   console.log('✅ /help enviado a grupo', CHAT_ID);
 });
 
-console.log('🤖 Bot activo con TOKEN1, escuchando comandos /top, /supertop, /tracks y /help');```
-
-**Resumen de los cambios clave**:
-
-- Se eliminó todo uso de `TELEGRAM_BOT_TOKEN` y `TELEGRAM_CHAT_ID`. Ahora sólo se usa:
-  ```bash
-  TELEGRAM_BOT_TOKEN1=<token entregado por BotFather>
-  TELEGRAM_CHAT_ID1=<chat_id del grupo donde el bot escribirá>
+console.log('🤖 Bot activo con TOKEN1, escuchando comandos /top, /supertop, /tracks y /help');
