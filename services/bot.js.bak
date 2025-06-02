@@ -4,7 +4,7 @@ import fetch from 'node-fetch';
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN1;
 const CHAT_ID  = process.env.TELEGRAM_CHAT_ID1;
-const THREAD_ID = process.env.TELEGRAM_THREAD_ID1 || 4; // ID del hilo en el que enviará cada mensaje
+const DEFAULT_THREAD_ID = process.env.TELEGRAM_THREAD_ID1 || 4; // Hilo por defecto
 
 if (!BOT_TOKEN || !CHAT_ID) {
   console.error('❌ Faltan las variables de entorno TELEGRAM_BOT_TOKEN1 y/o TELEGRAM_CHAT_ID1');
@@ -29,10 +29,10 @@ function calcularSemanaActual() {
   return Math.ceil((dias + inicio.getDay() + 1) / 7);
 }
 
-// Comando /top → envía el ranking semanal completo (todos los pilotos con sus tiempos) a un hilo específico
-bot.onText(/\/top/, async () => {
+// Comando /top → ranking semanal completo
+bot.onText(/\/top/, async (msg) => {
+  const threadId = msg.message_thread_id || DEFAULT_THREAD_ID;
   try {
-    // 1) Obtenemos los datos de /api/tiempos-mejorados
     const res = await fetch('https://ligavelocidrone.onrender.com/api/tiempos-mejorados');
     const data = await res.json();
 
@@ -40,7 +40,6 @@ bot.onText(/\/top/, async () => {
       throw new Error('Formato de datos de tiempos no válido');
     }
 
-    // 2) Construimos el mensaje con TODOS los pilotos ordenados por tiempo para cada pista
     const semana = calcularSemanaActual();
     let mensaje = `🏁 <b>Resultados Semanales - Semana ${semana}</b>\n`;
 
@@ -50,7 +49,6 @@ bot.onText(/\/top/, async () => {
         : 'Track 2 – 3 Lap: Single Class';
       mensaje += `\n📍 <b>${encabezado}</b>\n`;
 
-      // Ordenamos todos los resultados por tiempo ascendente
       const ordenados = pistaObj.resultados.slice().sort((a, b) => a.tiempo - b.tiempo);
 
       ordenados.forEach((r, i) => {
@@ -61,23 +59,23 @@ bot.onText(/\/top/, async () => {
       mensaje += '\n';
     });
 
-    // 3) Enviamos el mensaje a CHAT_ID en THREAD_ID
     await bot.sendMessage(CHAT_ID, mensaje, {
       parse_mode: 'HTML',
-      message_thread_id: THREAD_ID
+      message_thread_id: threadId
     });
-    console.log('✅ /top enviado a grupo', CHAT_ID, 'en hilo', THREAD_ID);
+    console.log('✅ /top enviado a grupo', CHAT_ID, 'en hilo', threadId);
   } catch (error) {
     console.error('❌ Error en /top:', error);
     await bot.sendMessage(CHAT_ID, `⚠️ No se pudo obtener el ranking semanal:\n${error.message}`, {
-      message_thread_id: THREAD_ID
+      message_thread_id: threadId
     });
   }
 });
 
-bot.onText(/\/supertop/, async () => {
+// Comando /supertop → clasificación anual
+bot.onText(/\/supertop/, async (msg) => {
+  const threadId = msg.message_thread_id || DEFAULT_THREAD_ID;
   try {
-    // 1) Obtenemos los datos de /api/enviar-ranking-anual
     const res = await fetch('https://ligavelocidrone.onrender.com/api/enviar-ranking-anual');
     const json = await res.json();
 
@@ -90,12 +88,11 @@ bot.onText(/\/supertop/, async () => {
 
     if (!dataArray || !Array.isArray(dataArray) || dataArray.length === 0) {
       await bot.sendMessage(CHAT_ID, '⚠️ La clasificación anual está vacía o no disponible.', {
-        message_thread_id: THREAD_ID
+        message_thread_id: threadId
       });
       return;
     }
 
-    // 2) Construimos el texto con medallas
     const encabezado = `<b>🏆 Clasificación Anual 🏆</b>\n\n`;
     const lineas = dataArray.map((jugador, i) => {
       const medalla = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '🎖️';
@@ -104,23 +101,23 @@ bot.onText(/\/supertop/, async () => {
 
     const mensaje = encabezado + lineas;
 
-    // 3) Enviamos el mensaje a CHAT_ID en THREAD_ID
     await bot.sendMessage(CHAT_ID, mensaje, {
       parse_mode: 'HTML',
-      message_thread_id: THREAD_ID
+      message_thread_id: threadId
     });
-    console.log('✅ /supertop enviado a grupo', CHAT_ID, 'en hilo', THREAD_ID);
+    console.log('✅ /supertop enviado a grupo', CHAT_ID, 'en hilo', threadId);
   } catch (error) {
     console.error('❌ Error en /supertop:', error);
     await bot.sendMessage(CHAT_ID, `⚠️ No se pudo obtener la clasificación anual:\n${error.message}`, {
-      message_thread_id: THREAD_ID
+      message_thread_id: threadId
     });
   }
 });
 
-bot.onText(/\/tracks/, async () => {
+// Comando /tracks → configuración de tracks semanales
+bot.onText(/\/tracks/, async (msg) => {
+  const threadId = msg.message_thread_id || DEFAULT_THREAD_ID;
   try {
-    // 1) Obtenemos los datos de /api/configuracion
     const res = await fetch('https://ligavelocidrone.onrender.com/api/configuracion');
     const json = await res.json();
 
@@ -132,12 +129,11 @@ bot.onText(/\/tracks/, async () => {
       !json.track2_nombrePista
     ) {
       await bot.sendMessage(CHAT_ID, '⚠️ Configuración de tracks no encontrada o incompleta.', {
-        message_thread_id: THREAD_ID
+        message_thread_id: threadId
       });
       return;
     }
 
-    // 2) Construimos el texto con la info de los tracks
     const texto =
       `<b>Track 1:</b>\n` +
       `Race Mode: Single Class\n` +
@@ -148,34 +144,35 @@ bot.onText(/\/tracks/, async () => {
       `Escenario: ${json.track2_nombreEscenario}\n` +
       `Track: ${json.track2_nombrePista}`;
 
-    // 3) Enviamos el mensaje a CHAT_ID en THREAD_ID
     await bot.sendMessage(CHAT_ID, texto, {
       parse_mode: 'HTML',
-      message_thread_id: THREAD_ID
+      message_thread_id: threadId
     });
-    console.log('✅ /tracks enviado a grupo', CHAT_ID, 'en hilo', THREAD_ID);
+    console.log('✅ /tracks enviado a grupo', CHAT_ID, 'en hilo', threadId);
   } catch (error) {
     console.error('❌ Error en /tracks:', error);
     await bot.sendMessage(CHAT_ID, `⚠️ No se pudo obtener los tracks semanales:\n${error.message}`, {
-      message_thread_id: THREAD_ID
+      message_thread_id: threadId
     });
   }
 });
 
-bot.onText(/\/help/, async () => {
+// Comando /help → lista de comandos en mismo hilo
+bot.onText(/\/help/, async (msg) => {
+  const threadId = msg.message_thread_id || DEFAULT_THREAD_ID;
   const texto =
     `<b>🤖 Comandos disponibles:</b>\n\n` +
     `<b>/top</b> - Envía el ranking semanal completo (todos los pilotos con sus tiempos).\n` +
     `<b>/supertop</b> - Muestra la clasificación anual actual.\n` +
     `<b>/tracks</b> - Muestra los escenarios y nombres de pista semanales.\n` +
     `<b>/help</b> - Muestra esta ayuda.\n\n` +
-    `Para ejecutar un comando, escríbelo en el chat.`;
+    `Para ejecutar un comando, escríbelo en este hilo.`;
 
   await bot.sendMessage(CHAT_ID, texto, {
     parse_mode: 'HTML',
-    message_thread_id: THREAD_ID
+    message_thread_id: threadId
   });
-  console.log('✅ /help enviado a grupo', CHAT_ID, 'en hilo', THREAD_ID);
+  console.log('✅ /help enviado a grupo', CHAT_ID, 'en hilo', threadId);
 });
 
 console.log('🤖 Bot activo con TOKEN1, escuchando comandos /top, /supertop, /tracks y /help');

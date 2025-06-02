@@ -4,7 +4,6 @@ import fetch from 'node-fetch';
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN1;
 const CHAT_ID  = process.env.TELEGRAM_CHAT_ID1;
-const DEFAULT_THREAD_ID = process.env.TELEGRAM_THREAD_ID1 || 4; // Hilo por defecto
 
 if (!BOT_TOKEN || !CHAT_ID) {
   console.error('❌ Faltan las variables de entorno TELEGRAM_BOT_TOKEN1 y/o TELEGRAM_CHAT_ID1');
@@ -29,9 +28,9 @@ function calcularSemanaActual() {
   return Math.ceil((dias + inicio.getDay() + 1) / 7);
 }
 
-// Comando /top → ranking semanal completo
-bot.onText(/\/top/, async (msg) => {
-  const threadId = msg.message_thread_id || DEFAULT_THREAD_ID;
+// /top → ranking semanal completo, siempre en thread_id = 4
+bot.onText(/\/top/, async () => {
+  const threadId = 4;
   try {
     const res = await fetch('https://ligavelocidrone.onrender.com/api/tiempos-mejorados');
     const data = await res.json();
@@ -72,9 +71,9 @@ bot.onText(/\/top/, async (msg) => {
   }
 });
 
-// Comando /supertop → clasificación anual
-bot.onText(/\/supertop/, async (msg) => {
-  const threadId = msg.message_thread_id || DEFAULT_THREAD_ID;
+// /supertop → clasificación anual, siempre en thread_id = 4
+bot.onText(/\/supertop/, async () => {
+  const threadId = 4;
   try {
     const res = await fetch('https://ligavelocidrone.onrender.com/api/enviar-ranking-anual');
     const json = await res.json();
@@ -114,9 +113,9 @@ bot.onText(/\/supertop/, async (msg) => {
   }
 });
 
-// Comando /tracks → configuración de tracks semanales
-bot.onText(/\/tracks/, async (msg) => {
-  const threadId = msg.message_thread_id || DEFAULT_THREAD_ID;
+// /tracks → configuración de tracks semanales, siempre en thread_id = 3
+bot.onText(/\/tracks/, async () => {
+  const threadId = 3;
   try {
     const res = await fetch('https://ligavelocidrone.onrender.com/api/configuracion');
     const json = await res.json();
@@ -157,7 +156,7 @@ bot.onText(/\/tracks/, async (msg) => {
   }
 });
 
-// Comando /help → lista de comandos en mismo hilo
+// /help → listado de comandos en el mismo hilo que se ejecuta
 bot.onText(/\/help/, async (msg) => {
   const threadId = msg.message_thread_id || DEFAULT_THREAD_ID;
   const texto =
