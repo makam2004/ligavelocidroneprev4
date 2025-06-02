@@ -5,8 +5,8 @@ import { fileURLToPath } from 'url';
 
 import adminRoutes from './routes/admin.js';
 import tiemposMejorados from './routes/tiemposMejorados.js';
-import supabase from './supabaseClient.js';
 import rankingRoutes from './routes/ranking.js';
+import supabase from './supabaseClient.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,36 +17,35 @@ const __dirname = path.dirname(__filename);
 // Middleware
 app.use(express.json());
 
-import basicAuth from 'express-basic-auth';
-
+// ✅ Definir credenciales de administrador desde variables de entorno
 const usuarios = {};
 usuarios[process.env.ADMIN_USER] = process.env.ADMIN_PASS;
 
-// Proteger admin.html
-app.use('/admin.html', basicAuth({
+// ✅ Protección explícita para admin.html (requiere login)
+app.get('/admin.html', basicAuth({
   users: usuarios,
-  challenge: true
-}));
-
-
-// Servir archivos estáticos
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Protección de acceso a /admin
-const adminAuth = basicAuth({
-  users: { [process.env.ADMIN_USER]: process.env.ADMIN_PASS },
   challenge: true,
   unauthorizedResponse: 'Acceso no autorizado'
-});
-
-app.get('/admin', adminAuth, (req, res) => {
+}), (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-// API protegida para cambiar tracks y reiniciar ranking semanal
+// ✅ Protección también para ruta /admin si es necesaria
+app.get('/admin', basicAuth({
+  users: usuarios,
+  challenge: true,
+  unauthorizedResponse: 'Acceso no autorizado'
+}), (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
+// ✅ Servir contenido estático desde la carpeta public
+app.use(express.static(path.join(__dirname, 'public')));
+
+// ✅ Rutas API protegidas para cambios desde la página admin
 app.use(adminRoutes);
 
-// Alta de jugador
+// ✅ Ruta pública para alta de jugadores
 app.post('/api/alta-jugador', async (req, res) => {
   const { nombre } = req.body;
 
@@ -54,7 +53,6 @@ app.post('/api/alta-jugador', async (req, res) => {
     return res.status(400).json({ error: 'Nombre requerido.' });
   }
 
-  // Comprobar si ya existe
   const { data: existe } = await supabase
     .from('jugadores')
     .select('id')
@@ -76,11 +74,11 @@ app.post('/api/alta-jugador', async (req, res) => {
   res.json({ ok: true });
 });
 
-// API pública de resultados
+// ✅ Rutas de resultados
 app.use(tiemposMejorados);
 app.use(rankingRoutes);
 
-// Iniciar servidor
+// ✅ Iniciar servidor
 app.listen(PORT, () => {
   console.log(`Servidor iniciado en http://localhost:${PORT}`);
 });

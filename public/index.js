@@ -7,6 +7,7 @@ import adminRoutes from './routes/admin.js';
 import tiemposMejorados from './routes/tiemposMejorados.js';
 import rankingRoutes from './routes/ranking.js';
 import supabase from './supabaseClient.js';
+import rankingAnualRoutes from './routes/rankingAnual.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -77,6 +78,7 @@ app.post('/api/alta-jugador', async (req, res) => {
 // ✅ Rutas de resultados
 app.use(tiemposMejorados);
 app.use(rankingRoutes);
+app.use(rankingAnualRoutes);
 
 // ✅ Iniciar servidor
 app.listen(PORT, () => {
