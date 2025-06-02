@@ -3,6 +3,7 @@ import express from 'express';
 import basicAuth from 'express-basic-auth';
 import supabase from '../supabaseClient.js';
 import fetch from 'node-fetch';
+import FormData from 'form-data';      // ← Importamos FormData desde 'form-data'
 import multer from 'multer';
 
 const router = express.Router();
@@ -46,17 +47,13 @@ router.post('/admin/update-tracks', async (req, res) => {
     try {
       const { error: rpcError } = await supabase.rpc('incrementar_ranking_anual');
       if (rpcError) {
-        // Si la relación no existe, supabase devuelve un error que contiene texto como:
-        // "relation \"ranking_anual\" does not exist"
         const msg = rpcError.message || '';
         if (!msg.includes('relation "ranking_anual" does not exist')) {
-          // Solo relanzamos si es un error distinto
           throw rpcError;
         }
         console.warn('⚠️ Se omitió incrementar ranking_anual: ', msg);
       }
     } catch (rpcCatch) {
-      // También puede caer en este catch si el propio supabase.rpc lanza en vez de devolver {error}
       const msg = (rpcCatch.message || '').toLowerCase();
       if (msg.includes('relation "ranking_anual" does not exist')) {
         console.warn('⚠️ Se omitió incrementar ranking_anual (tabla no existe).');
@@ -65,7 +62,7 @@ router.post('/admin/update-tracks', async (req, res) => {
       }
     }
 
-    // 3) Responder al cliente (el frontend/admin.js) sin error
+    // 3) Responder al cliente (el frontend/admin.js)
     res.status(200).json({ mensaje: '✅ Tracks actualizados correctamente.' });
   } catch (err) {
     console.error('❌ Error en update-tracks:', err.message);
@@ -73,21 +70,27 @@ router.post('/admin/update-tracks', async (req, res) => {
   }
 });
 
-// POST /admin/send-foto-top3 (igual que antes)
+// POST /admin/send-foto-top3
+//   - Recibe la imagen generada en el cliente y la envía a Telegram con sendPhoto
 router.post('/admin/send-foto-top3', upload.single('imagen'), async (req, res) => {
   try {
+    // 1) Validar que haya un archivo (en req.file.buffer)
     if (!req.file || !req.file.buffer) {
       return res.status(400).json({ ok: false, error: 'No se recibió la imagen.' });
     }
+
+    // 2) Obtener el thread_id (viene en req.body.thread_id o por defecto 4)
     const threadId = parseInt(req.body.thread_id, 10) || 4;
 
+    // 3) Credenciales de Telegram
     const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN1;
     const CHAT_ID  = process.env.TELEGRAM_CHAT_ID1;
     if (!BOT_TOKEN || !CHAT_ID) {
       throw new Error('Faltan TELEGRAM_BOT_TOKEN1 o TELEGRAM_CHAT_ID1 en variables de entorno.');
     }
 
-    const formData = new fetch.FormData();
+    // 4) Construir un FormData de 'form-data' para llamar a sendPhoto
+    const formData = new FormData();
     formData.append('chat_id', CHAT_ID);
     formData.append('photo', Buffer.from(req.file.buffer), {
       filename: 'podium_top3.jpg',
@@ -97,6 +100,7 @@ router.post('/admin/send-foto-top3', upload.single('imagen'), async (req, res) =
     formData.append('parse_mode', 'HTML');
     formData.append('message_thread_id', threadId);
 
+    // 5) Petición a Telegram para enviar la foto
     const responseTelegram = await fetch(
       `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,
       {
@@ -117,7 +121,8 @@ router.post('/admin/send-foto-top3', upload.single('imagen'), async (req, res) =
   }
 });
 
-// POST /api/commit-ranking (tal cual lo tenías)
+// POST /api/commit-ranking
+//   - Tal cual lo tenías antes, sin modificaciones
 router.post('/api/commit-ranking', async (_req, res) => {
   try {
     const { error: rpcError } = await supabase.rpc('incrementar_ranking_anual');
