@@ -258,3 +258,65 @@ formAgregarTip.onsubmit = async (e) => {
     mensajeAgregarTip.textContent = `❌ ${err.message}`;
   }
 };
+
+
+// 9) Manejar envío del formulario de “Agregar Tip”
+formAgregarTip.onsubmit = async (e) => {
+  e.preventDefault();
+  mensajeAgregarTip.style.color = 'white';
+  mensajeAgregarTip.textContent = '🔄 Subiendo tip…';
+
+  try {
+    await ensureSupabase();
+
+    // 9.1) Leer campos
+    const titulo = tipTitleInput.value.trim();
+    const url    = tipUrlInput.value.trim();
+    const tipo   = tipTypeInput.value.trim() || 'youtube';
+    if (!titulo || !url) throw new Error('Título y URL son obligatorios.');
+
+    // 9.2) Generar ID aleatorio
+    let id;
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      id = crypto.randomUUID();
+    } else {
+      id = String(Date.now()) + Math.floor(Math.random() * 1000);
+    }
+    // 9.3) Fecha actual en ISO
+    const fecha = new Date().toISOString();
+
+    // 9.4) Insertar en Supabase
+    const { data, error } = await supabaseClient
+      .from('tips')
+      .insert([{ id, titulo, url, tipo, fecha }]);
+
+    if (error) throw error;
+
+    // 9.5) Enviar notificación a Telegram
+    mensajeAgregarTip.textContent = '🔄 Enviando notificación a Telegram…';
+    const respTelegram = await fetch('/api/send-tip-telegram', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ titulo, url, tipo, fecha })
+    });
+    const jsonTelegram = await respTelegram.json();
+    if (!jsonTelegram.ok) throw new Error(jsonTelegram.error || 'Error al enviar a Telegram');
+
+    // 9.6) Mostrar éxito y cerrar popup
+    mensajeAgregarTip.style.color = 'lightgreen';
+    mensajeAgregarTip.textContent = '✅ Tip agregado y notificado a Telegram.';
+
+    if (window.cargarTipsPopup) {
+      await window.cargarTipsPopup();
+    }
+    setTimeout(() => {
+      popupAgregarTip.style.display = 'none';
+      overlayAgregarTip.style.display = 'none';
+    }, 1000);
+
+  } catch (err) {
+    console.error('Error agregando tip:', err);
+    mensajeAgregarTip.style.color = 'red';
+    mensajeAgregarTip.textContent = `❌ ${err.message}`;
+  }
+};

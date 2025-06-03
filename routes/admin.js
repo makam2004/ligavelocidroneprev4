@@ -139,4 +139,57 @@ router.post('/api/commit-ranking', async (_req, res) => {
   }
 });
 
+// ─── NUEVO: POST /api/send-tip-telegram ───
+// Recibe { titulo, url, tipo, fecha } y envía un mensaje al grupo en thread 194.
+router.post('/api/send-tip-telegram', async (req, res) => {
+  try {
+    const { titulo, url, tipo, fecha } = req.body;
+    if (!titulo || !url || !tipo || !fecha) {
+      return res.status(400).json({ ok: false, error: 'Faltan datos del tip.' });
+    }
+
+    // Credenciales de Telegram
+    const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN1;
+    const CHAT_ID  = process.env.TELEGRAM_CHAT_ID1;
+    const THREAD_ID = 194;  // Hilo fijo
+
+    if (!BOT_TOKEN || !CHAT_ID) {
+      throw new Error('Faltan TELEGRAM_BOT_TOKEN1 o TELEGRAM_CHAT_ID1 en variables de entorno.');
+    }
+
+    // Construir el texto del mensaje
+    const texto = 
+      `<b>📢 Nuevo Tip Agregado</b>\n\n` +
+      `<b>Título:</b> ${titulo}\n` +
+      `<b>URL:</b> ${url}\n` +
+      `<b>Tipo:</b> ${tipo}\n` +
+      `<b>Fecha:</b> ${new Date(fecha).toLocaleString()}`;
+
+    // Llamada a Telegram sendMessage
+    const formData = new FormData();
+    formData.append('chat_id', CHAT_ID);
+    formData.append('text', texto);
+    formData.append('parse_mode', 'HTML');
+    formData.append('message_thread_id', THREAD_ID);
+
+    const responseTelegram = await fetch(
+      `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
+      {
+        method: 'POST',
+        body: formData
+      }
+    );
+    const jsonTelegram = await responseTelegram.json();
+    if (!jsonTelegram.ok) {
+      console.error('Error enviando tip a Telegram:', jsonTelegram);
+      throw new Error(jsonTelegram.description || 'Fallo en sendMessage');
+    }
+
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error('❌ Error en /api/send-tip-telegram →', err.message);
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 export default router;
