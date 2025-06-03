@@ -38,9 +38,36 @@
       color: white;
       cursor: pointer;
     }
-    #mensaje, #mensajeCommit {
+    #mensaje, #mensajeCommit, #mensajeAgregarTip {
       margin-top: 20px;
       font-size: 16px;
+    }
+    /* Popup overlay */
+    #overlayAgregarTip {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+    }
+    /* Popup container */
+    #popupAgregarTip {
+      display: none;
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #222;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 400px;
+      z-index: 1001;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+    #popupAgregarTip h2 {
+      margin-top: 0;
+      font-size: 22px;
     }
   </style>
 </head>
@@ -75,10 +102,37 @@
   <button onclick="commitRanking()">Hacer Commit al Ranking Anual</button>
   <div id="mensajeCommit"></div>
 
+  <hr style="margin:40px 0; border-color: #444;" />
+
+  <!-- Sección “Tips” -->
+  <h3>Tips</h3>
+  <button id="btnAgregarTip">Agregar Tip</button>
+  <div id="mensajeAgregarTip"></div>
+
   <!-- Canvas oculto: se usará para componer las dos imágenes con los nombres de Top 3 -->
   <canvas id="canvasTop3" style="display:none;"></canvas>
 
-  <!-- Incluir script con toda la lógica de cliente -->
+  <!-- Overlay y popup “Agregar Tip” -->
+  <div id="overlayAgregarTip"></div>
+  <div id="popupAgregarTip">
+    <h2>Agregar Nuevo Tip</h2>
+    <form id="formAgregarTip">
+      <label>Título:
+        <input id="tipTitle" name="titulo" type="text" placeholder="Título del Tip" required />
+      </label>
+      <label>URL:
+        <input id="tipUrl" name="url" type="url" placeholder="https://..." required />
+      </label>
+      <label>Tipo:
+        <input id="tipType" name="tipo" type="text" value="youtube" required />
+      </label>
+      <button type="submit">Guardar Tip</button>
+    </form>
+    <div id="mensajeAgregarTip" style="margin-top:10px;"></div>
+  </div>
+
+  <!-- Incluir Supabase JS y luego admin.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
   <script src="admin.js"></script>
 </body>
 </html>
